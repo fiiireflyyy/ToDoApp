@@ -1,8 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
 import android.app.DatePickerDialog
-import android.content.res.Configuration
-import android.telecom.Call.Details
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,12 +49,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fenix.todoapp.R
-import com.fenix.todoapp.domain.model.Importance
 import com.fenix.todoapp.ui.addTodoScreen.AddTodoScreenViewModel
 import com.fenix.todoapp.ui.addTodoScreen.composable.ImportanceDropdown
 import com.fenix.todoapp.ui.addTodoScreen.state.AddTodoScreenState
