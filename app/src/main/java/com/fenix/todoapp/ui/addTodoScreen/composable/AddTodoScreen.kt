@@ -1,12 +1,12 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.res.Configuration
+import android.telecom.Call.Details
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,18 +18,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -51,29 +46,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fenix.todoapp.R
 import com.fenix.todoapp.domain.model.Importance
 import com.fenix.todoapp.ui.addTodoScreen.AddTodoScreenViewModel
+import com.fenix.todoapp.ui.addTodoScreen.composable.ImportanceDropdown
+import com.fenix.todoapp.ui.addTodoScreen.state.AddTodoScreenState
+import com.fenix.todoapp.ui.design.theme.ProgressBar
 import com.fenix.todoapp.ui.design.theme.backSecond
 import com.fenix.todoapp.ui.design.theme.blue
 import com.fenix.todoapp.ui.design.theme.blueTray
-import com.fenix.todoapp.ui.design.theme.gray
 import com.fenix.todoapp.ui.design.theme.label
 import com.fenix.todoapp.ui.design.theme.overlay
 import com.fenix.todoapp.ui.design.theme.red
 import com.fenix.todoapp.ui.design.theme.tertiry
 import com.fenix.todoapp.ui.design.theme.white
-import com.fenix.todoapp.ui.todoItemsScreen.TodoItemsScreenViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -83,15 +78,25 @@ import java.util.Locale
 fun AddTodoScreen(
     viewModel: AddTodoScreenViewModel,
     ) {
+    val todoUiState = viewModel.uiState.collectAsState().value
+    when (todoUiState) {
+        is AddTodoScreenState.Loading -> ProgressBar()
+        is AddTodoScreenState.Success -> DetailsTodo(viewModel)
+        is AddTodoScreenState.Error -> {}
+    }
+
+}
+@Composable
+fun DetailsTodo(
+    viewModel: AddTodoScreenViewModel,
+) {
     val description by viewModel.description.collectAsState()
     val importance by viewModel.importance.collectAsState()
     val deadline by viewModel.deadline.collectAsState()
     val canDelete by viewModel.canDelete.collectAsState()
-
     var showDatePicker by remember { mutableStateOf(false) }
     var switchState by remember { mutableStateOf(false) }
 
-    var expended by remember { mutableStateOf(false) }
     val topAppBarState = rememberTopAppBarState()
     val behavior = TopAppBarDefaults.pinnedScrollBehavior(
         state = topAppBarState,
@@ -102,7 +107,7 @@ fun AddTodoScreen(
         topBar = {
             TopAppBar(
                 modifier = Modifier
-                    .shadow( if (scrollState.value == 0) 0.dp else 8.dp)
+                    .shadow(if (scrollState.value == 0) 0.dp else 8.dp)
                     .fillMaxWidth()
                     .nestedScroll(behavior.nestedScrollConnection),
                 navigationIcon = {
@@ -147,295 +152,190 @@ fun AddTodoScreen(
             )
         })
     { paddingValues ->
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                )
+                .verticalScroll(scrollState)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            ElevatedCard(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        start = 16.dp,
-                        end = 16.dp,
-                    )
-                    .verticalScroll(scrollState)
-                    .background(MaterialTheme.colorScheme.background)
+                    .padding(top = 8.dp)
+                    .fillMaxWidth()
+                    .padding(paddingValues),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 8.dp
+                ),
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.white
+                )
             ) {
-                ElevatedCard(
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth()
-                        .padding(paddingValues),
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 8.dp
-                    ),
-                    colors = CardDefaults.elevatedCardColors(
-                        containerColor = MaterialTheme.colorScheme.white
-                    )
-                ) {
 
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        value = description,
-                        textStyle = TextStyle(
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = description,
+                    textStyle = TextStyle(
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 16.sp,
+                        lineHeight = 18.sp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    onValueChange = { viewModel.setDescription(it) },
+                    placeholder = {
+                        Text(
+                            text = "Что надо сделать...",
                             fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                            color = MaterialTheme.colorScheme.tertiry,
                             fontSize = 16.sp,
                             lineHeight = 18.sp,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                        ),
-                        onValueChange = { viewModel.setDescription(it) },
-                        placeholder = {
-                            Text(
-                                text = "Что надо сделать...",
-                                fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                                color = MaterialTheme.colorScheme.tertiry,
-                                fontSize = 16.sp,
-                                lineHeight = 18.sp,
-                            )
-                        },
-                        minLines = 3,
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = MaterialTheme.colorScheme.backSecond,
-                            focusedIndicatorColor = MaterialTheme.colorScheme.backSecond,
-                            unfocusedIndicatorColor = MaterialTheme.colorScheme.backSecond,
                         )
+                    },
+                    minLines = 3,
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = MaterialTheme.colorScheme.backSecond,
+                        focusedIndicatorColor = MaterialTheme.colorScheme.backSecond,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.backSecond,
                     )
-                }
-                Row(
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        bottom = 16.dp,
+                        start = 16.dp,
+                        top = 16.dp,
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Важность",
+                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                    color = MaterialTheme.colorScheme.label,
+                    fontSize = 16.sp,
+                )
+                ImportanceDropdown(
+                    importance = importance,
+                    onImportanceChange = { viewModel.setImportance(it) }
+                )
+
+            }
+
+
+            Divider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
                         .padding(
                             bottom = 16.dp,
                             start = 16.dp,
                             top = 16.dp,
                         ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Важность",
+                        text = "Сделать до",
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         color = MaterialTheme.colorScheme.label,
                         fontSize = 16.sp,
+                    )
+                    if (deadline != null) {
+                        Text(
+                            modifier = Modifier
+                                .padding(top = 4.dp)
+                                .clickable { showDatePicker = true },
+                            text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(deadline!!),
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                            color = MaterialTheme.colorScheme.blue,
                         )
-                    ImportanceDropdown(
-                        importance = importance,
-                        onImportanceChange = { viewModel.setImportance(it) }
-                    )
-
+                    }
                 }
-
-
-                Divider()
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(
-                                bottom = 16.dp,
-                                start = 16.dp,
-                                top = 16.dp,
-                            ),
-                    ) {
-                        Text(
-                            text = "Сделать до",
-                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                            color = MaterialTheme.colorScheme.label,
-                            fontSize = 16.sp,
-                            )
-                        if (deadline != null) {
-                            Text(
-                                modifier = Modifier
-                                    .padding(top = 4.dp)
-                                    .clickable { showDatePicker = true },
-                                text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(deadline!!),
-                                fontSize = 14.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                                color = MaterialTheme.colorScheme.blue,
-                            )
+                Switch(
+                    checked = deadline!=null || switchState,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.blue,
+                        checkedTrackColor = MaterialTheme.colorScheme.blueTray,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.white,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.overlay,
+                    ),
+                    onCheckedChange = {
+                        Log.d("mytag", it.toString())
+                        if (it) {
+                            switchState = true
+                            showDatePicker = true
+                        } else {
+                            showDatePicker = false
+                            switchState = false
+                            viewModel.setDeadline(null)
                         }
                     }
-                    Switch(
-                        checked = deadline!=null || switchState,
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.blue,
-                            checkedTrackColor = MaterialTheme.colorScheme.blueTray,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.white,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.overlay,
-                        ),
-                        onCheckedChange = {
-                            Log.d("mytag", it.toString())
-                            if (it) {
-                                switchState = true
-                                showDatePicker = true
-                            } else {
-                                showDatePicker = false
-                                switchState = false
-                                viewModel.setDeadline(null)
-                            }
-                        }
-                    )
-                }
-                Divider()
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-
-                    IconButton(
-                        onClick = {
-                            if (canDelete){
-                                viewModel.deleteTodo()
-                                viewModel.navigateBack()
-                            }
-                                  },
-                        enabled = canDelete
-                    ) {
-                        if (canDelete){
-                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.red)
-                        }
-                        else{
-                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.tertiry)
-                        }
-                    }
-                    if (canDelete){
-                        Text(
-                            text = "Удалить",
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.red,
-                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                            )
-                    }
-                    else{
-                        Text(
-                            text = "Удалить",
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.tertiry,
-                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                            )
-                    }
-
-
-                }
-            }
-            if (showDatePicker) {
-                DatePickerDialog(onDateSelected = { date ->
-                    viewModel.setDeadline(date)
-                    showDatePicker = false
-                }, onDismissRequest = {
-                    switchState = false
-                    showDatePicker = false
-                })
-            }
-        }
-}
-
-
-
-
-
-@Composable
-fun ImportanceDropdown(importance: Importance, onImportanceChange: (Importance) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box {
-        TextButton(
-            onClick = { expanded = true }) {
-            Row {
-                if (importance == Importance.High) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.hight_importance),
-                        contentDescription = "Warning Icon",
-                        tint = MaterialTheme.colorScheme.red,
-                        modifier = Modifier.padding(end = 4.dp)
-                    )
-                }
-                if(importance == Importance.Low){
-                    Icon(
-                        painter = painterResource(id = R.drawable.low_importance),
-                        contentDescription = "Low Priority",
-                        tint = MaterialTheme.colorScheme.gray,
-                        modifier = Modifier.padding(end = 4.dp)
-                    )
-                }
-                Text(
-                    text = when (importance) {
-                        Importance.Low -> "низкая"
-                        Importance.Medium -> "обычная"
-                        Importance.High -> "срочная"
-                    },
-                    color = if (importance == Importance.High) MaterialTheme.colorScheme.red else MaterialTheme.colorScheme.blue, // Устанавливаем красный цвет только для срочной важности
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto_medium))
                 )
             }
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            DropdownMenuItem(
-                text = {
-                    Row {
-                        Icon(
-                            painter = painterResource(id = R.drawable.low_importance),
-                            contentDescription = "Low Priority Icon",
-                            tint = Color.Gray,
-                            modifier = Modifier.padding(end = 4.dp)
-                        )
-                        Text(
-                            text = "низкая",
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                            color = MaterialTheme.colorScheme.label,
-                        )
+            Divider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+
+                IconButton(
+                    onClick = {
+                        if (canDelete){
+                            viewModel.deleteTodo()
+                            viewModel.navigateBack()
+                        }
+                    },
+                    enabled = canDelete
+                ) {
+                    if (canDelete){
+                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.red)
                     }
-                },
-                onClick = {
-                    onImportanceChange(Importance.Low)
-                    expanded = false
+                    else{
+                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.tertiry)
+                    }
                 }
-            )
-            DropdownMenuItem(
-                text = {
-                    Text(text = "обычная",
+                if (canDelete){
+                    Text(
+                        text = "Удалить",
                         fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.red,
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                        color = MaterialTheme.colorScheme.label,
-                        )
-                },
-                onClick = {
-                    onImportanceChange(Importance.Medium)
-                    expanded = false
+                    )
                 }
-            )
-            DropdownMenuItem(
-                text = {
-                    Row {
-                        Icon(
-                            painter = painterResource(id = R.drawable.hight_importance),
-                            contentDescription = "Warning Icon",
-                            tint = MaterialTheme.colorScheme.red,
-                            modifier = Modifier.padding(end = 4.dp)
-                        )
-                        Text(
-                            text = "срочная",
-                            color = MaterialTheme.colorScheme.red,
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                        )
-                    }
-                },
-                onClick = {
-                    onImportanceChange(Importance.High)
-                    expanded = false
+                else{
+                    Text(
+                        text = "Удалить",
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.tertiry,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                    )
                 }
-            )
+
+
+            }
+        }
+        if (showDatePicker) {
+            DatePickerDialog(onDateSelected = { date ->
+                viewModel.setDeadline(date)
+                showDatePicker = false
+            }, onDismissRequest = {
+                switchState = false
+                showDatePicker = false
+            })
         }
     }
 }

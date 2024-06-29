@@ -26,6 +26,7 @@ val BackPrimaryLightColor = Color(0xFFF7F6F2)
 val LightRedLigthColor = Color(0xFFFFE0DE)
 val LightBlueTrayColor = Color(0xFFADD1F6)
 val BackSecondaryLightColor = Color(0xFFFFFFFF)
+val BackElevatedLightColor = Color(0xFFFFFFFF)
 
 
 
@@ -48,4 +49,6 @@ val BackPrimaryDarkColor = Color(0xFF161618)
 val BackSecondaryDarkColor = Color(0xFF252528)
 val LightRedDarkColor = Color(0x0FFFE0DE)
 val DarkBlueTrayColor = Color(0xFF12375D)
+val BackElevatedDarkColor = Color(0xFF3C3C3F)
+
 

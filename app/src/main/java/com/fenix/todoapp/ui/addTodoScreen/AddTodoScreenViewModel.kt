@@ -2,13 +2,18 @@ package com.fenix.todoapp.ui.addTodoScreen
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.fenix.todoapp.data.Result
 import com.fenix.todoapp.data.repository.TodoItemsRepository
 import com.fenix.todoapp.domain.model.Importance
 import com.fenix.todoapp.domain.model.TodoItem
 import com.fenix.todoapp.navigation.Screen
+import com.fenix.todoapp.ui.addTodoScreen.state.AddTodoScreenState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.Date
 import javax.inject.Inject
@@ -35,7 +40,10 @@ class AddTodoScreenViewModel @Inject constructor(
     private val todoId: String? = navController
         .getBackStackEntry("${Screen.AddTodoScreen.route}/{todoid}")
         .arguments
-        ?.getString("todoid") ?: null
+        ?.getString("todoid")
+
+    private val _uiState = MutableStateFlow<AddTodoScreenState>(AddTodoScreenState.Loading)
+    val uiState = _uiState.asStateFlow()
 
     private var todoItem: TodoItem? = null
 
@@ -44,16 +52,30 @@ class AddTodoScreenViewModel @Inject constructor(
     }
 
     private fun getChangeItem(){
-        if (todoId !=null && todoId !="new"){
-            todoItem = repository.getTodoItemById(todoId)
-            _canDelete.value = true
-            if (todoItem !=null){
-                _importance.value = todoItem!!.importance
-                _description.value = todoItem!!.description
-                _deadline.value = todoItem!!.deadline
+        if (todoId !=null){
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.getItemById(todoId).collect{result ->
+                    when(result){
+                        is Result.Success -> {
+                            _uiState.value = AddTodoScreenState.Success
+                            todoItem = result.data
+                            _canDelete.value = true
+                            _importance.value = todoItem!!.importance
+                            _description.value = todoItem!!.description
+                            _deadline.value = todoItem!!.deadline
+                        }
+                        is Result.Loading -> {
+                            _uiState.value = AddTodoScreenState.Loading
+                        }
+                        is Result.Error -> {
+                            _uiState.value = AddTodoScreenState.Error(result.e.toString())
+                        }
+                    }
+                }
             }
         }
         else{
+            _uiState.value = AddTodoScreenState.Success
             _canDelete.value = false
         }
     }
@@ -71,39 +93,39 @@ class AddTodoScreenViewModel @Inject constructor(
     }
 
     fun changeTodoItem(){
-        if (todoItem == null){
-            val newItem = TodoItem(
-                id = LocalDateTime.now().toString(),
-                description = description.value,
-                importance = importance.value,
-                isDone = false,
-                creationDate = LocalDateTime.now(),
-                deadline = deadline.value
-            )
-            repository.addTodoItem(newItem)
+        viewModelScope.launch(Dispatchers.IO) {
+            if (todoItem == null){
+                val newItem = TodoItem(
+                    id = LocalDateTime.now().toString(),
+                    description = description.value,
+                    importance = importance.value,
+                    isDone = false,
+                    creationDate = LocalDateTime.now(),
+                    deadline = deadline.value
+                )
+                repository.addTodoItem(newItem)
+            }
+            else{
+                todoItem = todoItem!!.copy(
+                    description = description.value,
+                    importance = importance.value,
+                    deadline = deadline.value,
+                    changeDate = LocalDateTime.now()
+                )
+                repository.changeTodoItem(todoItem)
+            }
         }
-        else{
-            todoItem = todoItem!!.copy(
-                description = description.value,
-                importance = importance.value,
-                deadline = deadline.value,
-                changeDate = LocalDateTime.now()
-            )
-            repository.updateTodoItem(todoItem)
-        }
+
     }
 
     fun deleteTodo(){
-        repository.deleteTodo(todoId!!)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteTodo(todoId!!)
+        }
     }
 
     fun navigateBack(){
         navController.popBackStack()
     }
 
-
-    override fun onCleared() {
-        super.onCleared()
-        Log.d("mytag","смерть")
-    }
 }
