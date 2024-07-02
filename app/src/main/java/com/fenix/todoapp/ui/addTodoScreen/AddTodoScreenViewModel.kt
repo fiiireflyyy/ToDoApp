@@ -92,9 +92,9 @@ class AddTodoScreenViewModel @Inject constructor(
         _deadline.value = value
     }
 
-    fun changeTodoItem(){
+    fun changeTodoItem() {
         viewModelScope.launch(Dispatchers.IO) {
-            if (todoItem == null){
+            if (todoItem == null) {
                 val newItem = TodoItem(
                     id = LocalDateTime.now().toString(),
                     description = description.value,
