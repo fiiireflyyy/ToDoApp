@@ -59,21 +59,9 @@ fun Navigation() {
                 )
         }
 
-//        composable(
-//            route = Screen.AddTodoScreen.route,
-//        ){
-//            val addViewModel = remember {
-//                addTodoItemsScreenComponent.addItemsViewModel()
-//            }
-//
-//            AddTodoScreen(
-//                viewModel = addViewModel,
-//                )
-//        }
-
         composable(
             route = "${Screen.AddTodoScreen.route}/{todoid}",
-            arguments = listOf(navArgument("todoid") { type = NavType.StringType })
+            arguments = listOf(navArgument("todoid") { type = NavType.StringType; nullable = true })
         ){
             val addViewModel = remember {
                 addTodoItemsScreenComponent.addItemsViewModel()
@@ -88,26 +76,4 @@ fun Navigation() {
 
 
 
-//    val navController = rememberNavController()
-//    val repo = TodoItemsRepository()
-//    val todoItemsScreenViewModel = TodoItemsScreenViewModel(repo)
-//
-//    NavHost(navController = navController, startDestination = "todoList") {
-//
-//        composable("todoList") {
-//            TodoItemsScreen(
-//                viewModel = todoItemsScreenViewModel,
-//                onAddClick = { navController.navigate("addTodo") },
-//            )
-//        }
-//        composable("addTodo") {
-//            val addTodoItemsScreenViewModel = AddTodoScreenViewModel(repo)
-//
-//            AddTodoScreen(
-//                viewModel = addTodoItemsScreenViewModel,
-//                onSave = { navController.popBackStack() },
-//                onCancel = { navController.popBackStack() },
-//            )
-//        }
-//    }
 }

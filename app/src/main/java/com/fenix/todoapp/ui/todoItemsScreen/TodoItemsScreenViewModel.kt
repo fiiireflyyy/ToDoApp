@@ -7,6 +7,11 @@ import androidx.navigation.NavController
 import com.fenix.todoapp.data.repository.TodoItemsRepository
 import com.fenix.todoapp.domain.model.TodoItem
 import com.fenix.todoapp.navigation.Screen
+import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemModelUi
+import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
@@ -20,50 +25,82 @@ class TodoItemsScreenViewModel @Inject constructor(
     private val navController: NavController,
     private val repository: TodoItemsRepository,
 ) : ViewModel(){
-    private val _todoItems = MutableStateFlow<List<TodoItem>>(emptyList())
-    val todoItems = _todoItems.asStateFlow()
 
+    private var todoItems = listOf<TodoItemModelUi>()
 
-    private val _completedCount = MutableStateFlow(0)
-    val completedCount = _completedCount.asStateFlow()
-
-    private val _showDone = MutableStateFlow(true)
-    val showDone = _showDone.asStateFlow()
-
+    private val _todoItemsScreenUiState = MutableStateFlow<TodoItemsScreenState>(TodoItemsScreenState.Loading)
+    val todoItemsScreenUiState = _todoItemsScreenUiState.asStateFlow()
 
     init{
         loadTodoItems()
-        Log.d("mytag","создалась 1234")
     }
 
     private fun loadTodoItems(){
-        viewModelScope.launch {
-            repository.todoItems.collect{
-                _todoItems.value = it
-                _completedCount.value = todoItems.value.count { it.isDone }
-                if(!showDone.value){
-                    _todoItems.value = _todoItems.value.filter { !it.isDone }
-                }
+        repository.todoItems.collectIn(viewModelScope){ todoItemsList ->
+
+            val currentTodoItemsScreenUiState = todoItemsScreenUiState.value
+            val isShowDone = when(currentTodoItemsScreenUiState){
+                is TodoItemsScreenState.Success -> currentTodoItemsScreenUiState.isShowDone
+                else -> false
             }
+            todoItems = todoItemsList.map { it.toTodoItemsUiModel() }
+            _todoItemsScreenUiState.value = TodoItemsScreenState.Success(
+                todoItems = if (isShowDone) {
+                    todoItems.filter { !it.isDone }
+                } else{
+                    todoItems
+                },
+                completedCount = todoItems.count { it.isDone },
+                isShowDone = isShowDone,
+            )
         }
     }
 
     fun changeShowDone(value: Boolean){
-        _showDone.value = !value
-        loadTodoItems()
-
+        _todoItemsScreenUiState.value = TodoItemsScreenState.Success(
+            todoItems = if(value){
+                todoItems.filter { !it.isDone }
+            } else{
+                todoItems
+            },
+            completedCount = todoItems.count { it.isDone },
+            isShowDone = value,
+        )
     }
 
-    fun navigateToAddTodo(){
-        navController.navigate("${Screen.AddTodoScreen.route}/new")
-    }
 
-    fun navigateToAddTodo(id: String){
+    fun navigateToAddTodo(id: String?){
         navController.navigate("${Screen.AddTodoScreen.route}/${id}")
     }
 
-    fun updateTodoItem(item: TodoItem){
-        repository.updateTodoItem(item)
-        loadTodoItems()
+    fun updateTodoItem(id: String, isDone: Boolean){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateTodoItem(id, isDone)
+        }
     }
+
+    fun deleteTodo(todoId: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteTodo(todoId)
+        }
+    }
+
+    fun TodoItem.toTodoItemsUiModel(): TodoItemModelUi{
+        return TodoItemModelUi(
+            id = id,
+            description = description,
+            isDone = isDone,
+            importance = importance,
+            deadline = deadline,
+        )
+    }
+
+
+    fun <T> Flow<T>.collectIn(scope: CoroutineScope, action: (T) -> Unit){
+        scope.launch(Dispatchers.IO) {
+            collect(action)
+        }
+    }
+
 }
+
