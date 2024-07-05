@@ -30,13 +30,11 @@ class AddTodoScreenViewModel @Inject constructor(
     private val _importance = MutableStateFlow<Importance>(Importance.Medium)
     val importance = _importance.asStateFlow()
 
-
     private val _description = MutableStateFlow<String>("")
     val description = _description.asStateFlow()
 
     private val _deadline = MutableStateFlow<Date?>(null)
     val deadline = _deadline.asStateFlow()
-
 
     private var _canDelete = MutableStateFlow(false)
     val canDelete = _canDelete.asStateFlow()
@@ -56,14 +54,13 @@ class AddTodoScreenViewModel @Inject constructor(
 
     init {
         getChangeItem()
-        collectResult()
+//        collectResult()
     }
 
     private fun getChangeItem(){
-        if (todoId !=null){
+        if (todoId != null){
             viewModelScope.launch(Dispatchers.IO) {
-                val result = repository.getItemById(todoId)
-                    when(result){
+                when (val result = repository.getItemById(todoId)) {
                         is Result.Success -> {
                             _uiState.value = AddTodoScreenState.Success
                             val currentTodoItem = result.data
@@ -88,8 +85,8 @@ class AddTodoScreenViewModel @Inject constructor(
     private fun collectResult(){
         viewModelScope.launch {
             repository.todoItems.collect { result ->
-                when(result){
-                    is Result.Success -> {}
+                when(result) {
+                    is Result.Success -> { navigateBack() }
                     is Result.Error -> {
                         _uiState.value = AddTodoScreenState.Success
                         val errorMessage = result.e.message
@@ -121,7 +118,7 @@ class AddTodoScreenViewModel @Inject constructor(
     }
 
     fun changeTodoItem() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val currentTodoItem = todoItem
             if (currentTodoItem == null) {
                 val newItem = TodoItem(
@@ -133,7 +130,19 @@ class AddTodoScreenViewModel @Inject constructor(
                     deadline = deadline.value
                 )
                 _uiState.value = AddTodoScreenState.Loading
-                repository.addTodoItem(newItem)
+
+                when (val result = repository.addTodoItem(newItem)) {
+                    is Result.Success -> navigateBack()
+                    is Result.Error -> {
+                        val errorMessage = result.e.message
+                        if (errorMessage == null) {
+                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
+                        } else {
+                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage(errorMessage))
+                        }
+                        _uiState.value = AddTodoScreenState.Success
+                    }
+                }
             } else {
                 todoItem = currentTodoItem.copy(
                     description = description.value,
@@ -153,7 +162,7 @@ class AddTodoScreenViewModel @Inject constructor(
         }
     }
 
-    fun navigateBack(){
+    fun navigateBack() {
         navController.popBackStack()
     }
 

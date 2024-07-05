@@ -10,16 +10,28 @@ import com.fenix.todoapp.navigation.Navigation
 import com.fenix.todoapp.ui.design.theme.ToDoTheme
 
 class MainActivity : ComponentActivity() {
+
+    private val networkMonitor by lazy {
+        NetworkMonitor(
+            context = this,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val app = application as App
         app.appComponent.inject(this)
         WorkScheduler.schedulerWork(this)
-        var networkMonitor = NetworkMonitor(this)
+        networkMonitor.registerNetworkCallback()
         setContent {
             ToDoTheme {
                 Navigation()
             }
         }
+    }
+
+    override fun onDestroy() {
+        networkMonitor.unregisterNetworkCallback()
+        super.onDestroy()
     }
 }

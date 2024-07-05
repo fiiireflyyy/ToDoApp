@@ -7,7 +7,5 @@ sealed interface TodoItemsScreenState {
         val completedCount: Int,
         val isShowDone: Boolean,
     ) : TodoItemsScreenState
-    data class Error(
-        val message: String,
-    ) : TodoItemsScreenState
+    data object Error : TodoItemsScreenState
 }

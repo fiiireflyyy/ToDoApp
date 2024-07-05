@@ -129,10 +129,7 @@ fun DetailsTodo(
                                 contentColor = MaterialTheme.colorScheme.blue,
                                 containerColor = MaterialTheme.colorScheme.background,
                             ),
-                            onClick = {
-                                viewModel.changeTodoItem()
-                                viewModel.navigateBack()
-                            }
+                            onClick = viewModel::changeTodoItem
                         ) {
                             Text(
                                 text = "СОХРАНИТЬ",

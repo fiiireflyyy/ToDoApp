@@ -39,7 +39,7 @@ class TodoItemsScreenViewModel @Inject constructor(
     private val _uiEffectFlow = MutableSharedFlow<TodoItemsScreenUiEffects>()
     val uiEffectFlow = _uiEffectFlow.asSharedFlow()
 
-    init{
+    init {
         getListFromBase()
         loadTodoItems()
     }
@@ -64,18 +64,11 @@ class TodoItemsScreenViewModel @Inject constructor(
                         )
                     }
                     is Result.Error -> {
-                        val errorMessage = todoItemsList.e.message
-                        if (errorMessage == null) {
-                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
-                        } else {
-                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage(errorMessage))
-                        }
+                        emitErrorMessage(todoItemsList.e.message)
+                        _todoItemsScreenUiState.value = TodoItemsScreenState.Error
                     }
                     null -> {
-                        _todoItemsScreenUiState.value = TodoItemsScreenState.Error(
-                            TodoItemsScreenUiEffects.SomethingWentWrongMessage.toString()
-                        )
-                        _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
+                        _todoItemsScreenUiState.value = TodoItemsScreenState.Loading
                     }
                 }
             }
@@ -105,9 +98,12 @@ class TodoItemsScreenViewModel @Inject constructor(
         navController.navigate("${Screen.AddTodoScreen.route}/${id}")
     }
 
-    fun updateTodoItem(id: String, isDone: Boolean){
+    fun updateTodoItem(id: String, isDone: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateTodoItem(id, isDone)
+            when (val result = repository.updateTodoItem(id, isDone)) {
+                is Result.Success -> {}
+                is Result.Error -> emitErrorMessage(result.e.message)
+            }
         }
     }
 
@@ -117,7 +113,15 @@ class TodoItemsScreenViewModel @Inject constructor(
         }
     }
 
-    fun TodoItem.toTodoItemsUiModel(): TodoItemModelUi{
+    private suspend fun emitErrorMessage(message: String?) {
+        if (message == null) {
+            _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
+        } else {
+            _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage(message))
+        }
+    }
+
+    private fun TodoItem.toTodoItemsUiModel(): TodoItemModelUi{
         return TodoItemModelUi(
             id = id,
             description = description,
@@ -125,13 +129,6 @@ class TodoItemsScreenViewModel @Inject constructor(
             importance = importance,
             deadline = deadline,
         )
-    }
-
-
-    fun <T> Flow<T>.collectIn(scope: CoroutineScope, action: (T) -> Unit){
-        scope.launch(Dispatchers.IO) {
-            collect(action)
-        }
     }
 
 }
