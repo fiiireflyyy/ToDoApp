@@ -4,15 +4,20 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.fenix.todoapp.data.Result
 import com.fenix.todoapp.data.repository.TodoItemsRepository
 import com.fenix.todoapp.domain.model.TodoItem
 import com.fenix.todoapp.navigation.Screen
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemModelUi
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenState
+import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenUiEffects
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -31,28 +36,55 @@ class TodoItemsScreenViewModel @Inject constructor(
     private val _todoItemsScreenUiState = MutableStateFlow<TodoItemsScreenState>(TodoItemsScreenState.Loading)
     val todoItemsScreenUiState = _todoItemsScreenUiState.asStateFlow()
 
+    private val _uiEffectFlow = MutableSharedFlow<TodoItemsScreenUiEffects>()
+    val uiEffectFlow = _uiEffectFlow.asSharedFlow()
+
     init{
+        getListFromBase()
         loadTodoItems()
     }
 
     private fun loadTodoItems(){
-        repository.todoItems.collectIn(viewModelScope){ todoItemsList ->
-
-            val currentTodoItemsScreenUiState = todoItemsScreenUiState.value
-            val isShowDone = when(currentTodoItemsScreenUiState){
-                is TodoItemsScreenState.Success -> currentTodoItemsScreenUiState.isShowDone
-                else -> false
+        viewModelScope.launch {
+            repository.todoItems.collect { todoItemsList ->
+                Log.d("TESTLOG","ВЫЗВАЛСЯ КОЛЛЕКТ")
+                val currentTodoItemsScreenUiState = todoItemsScreenUiState.value
+                val isShowDone = when(currentTodoItemsScreenUiState){
+                    is TodoItemsScreenState.Success -> currentTodoItemsScreenUiState.isShowDone
+                    else -> false
+                }
+                when (todoItemsList) {
+                    is Result.Success -> {
+                        todoItems = todoItemsList.data.map { it.toTodoItemsUiModel() }
+                        val itemsToShow = if (isShowDone) todoItems.filter { !it.isDone } else todoItems
+                        _todoItemsScreenUiState.value = TodoItemsScreenState.Success(
+                            todoItems = itemsToShow,
+                            completedCount = todoItems.count { it.isDone },
+                            isShowDone = isShowDone,
+                        )
+                    }
+                    is Result.Error -> {
+                        val errorMessage = todoItemsList.e.message
+                        if (errorMessage == null) {
+                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
+                        } else {
+                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage(errorMessage))
+                        }
+                    }
+                    null -> {
+                        _todoItemsScreenUiState.value = TodoItemsScreenState.Error(
+                            TodoItemsScreenUiEffects.SomethingWentWrongMessage.toString()
+                        )
+                        _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
+                    }
+                }
             }
-            todoItems = todoItemsList.map { it.toTodoItemsUiModel() }
-            _todoItemsScreenUiState.value = TodoItemsScreenState.Success(
-                todoItems = if (isShowDone) {
-                    todoItems.filter { !it.isDone }
-                } else{
-                    todoItems
-                },
-                completedCount = todoItems.count { it.isDone },
-                isShowDone = isShowDone,
-            )
+        }
+    }
+    fun getListFromBase(){
+        viewModelScope.launch {
+            _todoItemsScreenUiState.value = TodoItemsScreenState.Loading
+            repository.getList()
         }
     }
 

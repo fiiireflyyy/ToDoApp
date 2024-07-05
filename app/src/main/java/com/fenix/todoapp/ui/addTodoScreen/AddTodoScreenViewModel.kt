@@ -10,9 +10,13 @@ import com.fenix.todoapp.domain.model.Importance
 import com.fenix.todoapp.domain.model.TodoItem
 import com.fenix.todoapp.navigation.Screen
 import com.fenix.todoapp.ui.addTodoScreen.state.AddTodoScreenState
+import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenUiEffects
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.Date
@@ -45,27 +49,29 @@ class AddTodoScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<AddTodoScreenState>(AddTodoScreenState.Loading)
     val uiState = _uiState.asStateFlow()
 
+    private val _uiEffectFlow = MutableSharedFlow<TodoItemsScreenUiEffects>()
+    val uiEffectFlow = _uiEffectFlow.asSharedFlow()
+
     private var todoItem: TodoItem? = null
 
     init {
         getChangeItem()
+        collectResult()
     }
 
     private fun getChangeItem(){
         if (todoId !=null){
             viewModelScope.launch(Dispatchers.IO) {
-                repository.getItemById(todoId).collect{result ->
+                val result = repository.getItemById(todoId)
                     when(result){
                         is Result.Success -> {
                             _uiState.value = AddTodoScreenState.Success
-                            todoItem = result.data
+                            val currentTodoItem = result.data
+                            todoItem = currentTodoItem
                             _canDelete.value = true
-                            _importance.value = todoItem!!.importance
-                            _description.value = todoItem!!.description
-                            _deadline.value = todoItem!!.deadline
-                        }
-                        is Result.Loading -> {
-                            _uiState.value = AddTodoScreenState.Loading
+                            _importance.value = currentTodoItem.importance
+                            _description.value = currentTodoItem.description
+                            _deadline.value = currentTodoItem.deadline
                         }
                         is Result.Error -> {
                             _uiState.value = AddTodoScreenState.Error(result.e.toString())
@@ -73,10 +79,32 @@ class AddTodoScreenViewModel @Inject constructor(
                     }
                 }
             }
-        }
         else{
             _uiState.value = AddTodoScreenState.Success
             _canDelete.value = false
+        }
+    }
+
+    private fun collectResult(){
+        viewModelScope.launch {
+            repository.todoItems.collect { result ->
+                when(result){
+                    is Result.Success -> {}
+                    is Result.Error -> {
+                        _uiState.value = AddTodoScreenState.Success
+                        val errorMessage = result.e.message
+                        if (errorMessage == null) {
+                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
+                        } else {
+                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage(errorMessage))
+                        }
+                    }
+                    null -> {
+                        _uiState.value = AddTodoScreenState.Success
+                        _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
+                    }
+                }
+            }
         }
     }
 
@@ -94,7 +122,8 @@ class AddTodoScreenViewModel @Inject constructor(
 
     fun changeTodoItem() {
         viewModelScope.launch(Dispatchers.IO) {
-            if (todoItem == null) {
+            val currentTodoItem = todoItem
+            if (currentTodoItem == null) {
                 val newItem = TodoItem(
                     id = LocalDateTime.now().toString(),
                     description = description.value,
@@ -103,10 +132,10 @@ class AddTodoScreenViewModel @Inject constructor(
                     creationDate = LocalDateTime.now(),
                     deadline = deadline.value
                 )
+                _uiState.value = AddTodoScreenState.Loading
                 repository.addTodoItem(newItem)
-            }
-            else{
-                todoItem = todoItem!!.copy(
+            } else {
+                todoItem = currentTodoItem.copy(
                     description = description.value,
                     importance = importance.value,
                     deadline = deadline.value,

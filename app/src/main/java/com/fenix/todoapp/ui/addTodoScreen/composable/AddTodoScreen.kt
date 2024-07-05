@@ -2,6 +2,7 @@
 
 import android.app.DatePickerDialog
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +37,7 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fenix.todoapp.R
 import com.fenix.todoapp.ui.addTodoScreen.AddTodoScreenViewModel
 import com.fenix.todoapp.ui.addTodoScreen.composable.ImportanceDropdown
@@ -64,6 +67,8 @@ import com.fenix.todoapp.ui.design.theme.overlay
 import com.fenix.todoapp.ui.design.theme.red
 import com.fenix.todoapp.ui.design.theme.tertiry
 import com.fenix.todoapp.ui.design.theme.white
+import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenUiEffects
+import kotlinx.coroutines.flow.Flow
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -74,6 +79,8 @@ fun AddTodoScreen(
     viewModel: AddTodoScreenViewModel,
     ) {
     val todoUiState = viewModel.uiState.collectAsState().value
+    ShowUiEffectsIfNeeded(uiEffectFlow = viewModel.uiEffectFlow)
+
     when (todoUiState) {
         is AddTodoScreenState.Loading -> ProgressBar()
         is AddTodoScreenState.Success -> DetailsTodo(viewModel)
@@ -85,10 +92,10 @@ fun AddTodoScreen(
 fun DetailsTodo(
     viewModel: AddTodoScreenViewModel,
 ) {
-    val description by viewModel.description.collectAsState()
-    val importance by viewModel.importance.collectAsState()
-    val deadline by viewModel.deadline.collectAsState()
-    val canDelete by viewModel.canDelete.collectAsState()
+    val description by viewModel.description.collectAsStateWithLifecycle()
+    val importance by viewModel.importance.collectAsStateWithLifecycle()
+    val deadline by viewModel.deadline.collectAsStateWithLifecycle()
+    val canDelete by viewModel.canDelete.collectAsStateWithLifecycle()
     var showDatePicker by remember { mutableStateOf(false) }
     var switchState by remember { mutableStateOf(false) }
 
@@ -359,4 +366,21 @@ fun DatePickerDialog(onDateSelected: (Date) -> Unit, onDismissRequest: () -> Uni
     }
 
     datePickerDialog.show()
+}
+
+@Composable
+private fun ShowUiEffectsIfNeeded(uiEffectFlow: Flow<TodoItemsScreenUiEffects>) {
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        uiEffectFlow.collect { uiEffect ->
+            when (uiEffect) {
+                is TodoItemsScreenUiEffects.SomethingWentWrongMessage -> {
+                    Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
+                }
+                is TodoItemsScreenUiEffects.CustomMessage -> {
+                    Toast.makeText(context, uiEffect.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 }
