@@ -11,21 +11,25 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +48,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fenix.todoapp.ui.design.theme.ProgressBar
 import com.fenix.todoapp.ui.design.theme.green
+import com.fenix.todoapp.ui.design.theme.label
 import com.fenix.todoapp.ui.design.theme.red
 import com.fenix.todoapp.ui.design.theme.white
 import com.fenix.todoapp.ui.todoItemsScreen.TodoItemsScreenViewModel
@@ -70,7 +75,7 @@ fun TodoItemsScreen(viewModel: TodoItemsScreenViewModel) {
             onDelete = viewModel::deleteTodo,
             navigateToAddTodo = viewModel::navigateToAddTodo,
         )
-        is TodoItemsScreenState.Error -> showUpdateBtn(
+        is TodoItemsScreenState.Error -> ShowUpdateBtn(
             onClick = viewModel::getListFromBase
         )
     }
@@ -93,14 +98,27 @@ private fun ShowUiEffectsIfNeeded(uiEffectFlow: Flow<TodoItemsScreenUiEffects>) 
     }
 }
 @Composable
-fun showUpdateBtn(
+fun ShowUpdateBtn(
     onClick: ()->Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
         ){
-        Button(onClick = onClick) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Что-то пошло не так...",
+                color = MaterialTheme.colorScheme.label)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = onClick,
+            ) {
+                Text(text = "Обновить", color = MaterialTheme.colorScheme.white)
+            }
         }
     }
 }

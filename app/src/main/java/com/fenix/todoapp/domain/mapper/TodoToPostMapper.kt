@@ -9,7 +9,9 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 import javax.inject.Inject
-
+/**
+ * [TodoToPostMapper] responsible for transform data item
+ */
 class TodoToPostMapper @Inject constructor() {
 
     fun mapToPost(todoItem: TodoItem) : PostTodo {
@@ -27,7 +29,7 @@ class TodoToPostMapper @Inject constructor() {
             deadLine = todoItem.deadline?.toUnixTimestamp(),
             isCompleted = todoItem.isDone,
             creationDate =  todoItem.creationDate.toUnixTimestamp(),
-            refactorDate = 1720082697,
+            refactorDate = todoItem.creationDate.toUnixTimestamp(),
             byPhone = "1",
         )
     }
@@ -54,9 +56,6 @@ fun Date.toUnixTimestamp(): Long {
 }
 fun Long.toDate(): Date {
     return Date(this * 1000)
-}
-fun Importance.toStringValue(): String {
-    return this.level
 }
 fun String.toImportance(): Importance = when (this.lowercase()) {
     "low" -> Importance.Low

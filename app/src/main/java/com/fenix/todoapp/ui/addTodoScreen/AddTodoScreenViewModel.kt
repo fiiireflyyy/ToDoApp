@@ -1,11 +1,11 @@
 package com.fenix.todoapp.ui.addTodoScreen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.fenix.todoapp.data.Result
 import com.fenix.todoapp.data.repository.TodoItemsRepository
+import com.fenix.todoapp.domain.mapper.TodoToPostMapper
 import com.fenix.todoapp.domain.model.Importance
 import com.fenix.todoapp.domain.model.TodoItem
 import com.fenix.todoapp.navigation.Screen
@@ -16,12 +16,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.Date
 import javax.inject.Inject
-
+/**
+ * [AddTodoScreenViewModel] is responsible for managing the UI-related data for the Add Todo screen.
+ */
 class AddTodoScreenViewModel @Inject constructor(
     private val repository: TodoItemsRepository,
     private val navController: NavController,
@@ -54,7 +55,6 @@ class AddTodoScreenViewModel @Inject constructor(
 
     init {
         getChangeItem()
-//        collectResult()
     }
 
     private fun getChangeItem(){
@@ -79,29 +79,6 @@ class AddTodoScreenViewModel @Inject constructor(
         else{
             _uiState.value = AddTodoScreenState.Success
             _canDelete.value = false
-        }
-    }
-
-    private fun collectResult(){
-        viewModelScope.launch {
-            repository.todoItems.collect { result ->
-                when(result) {
-                    is Result.Success -> { navigateBack() }
-                    is Result.Error -> {
-                        _uiState.value = AddTodoScreenState.Success
-                        val errorMessage = result.e.message
-                        if (errorMessage == null) {
-                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
-                        } else {
-                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage(errorMessage))
-                        }
-                    }
-                    null -> {
-                        _uiState.value = AddTodoScreenState.Success
-                        _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
-                    }
-                }
-            }
         }
     }
 
@@ -144,13 +121,25 @@ class AddTodoScreenViewModel @Inject constructor(
                     }
                 }
             } else {
+                _uiState.value = AddTodoScreenState.Loading
                 todoItem = currentTodoItem.copy(
                     description = description.value,
                     importance = importance.value,
                     deadline = deadline.value,
                     changeDate = LocalDateTime.now()
                 )
-                repository.changeTodoItem(todoItem)
+                when (val result = repository.changeTodoItem(todoItem)) {
+                    is Result.Success -> navigateBack()
+                    is Result.Error -> {
+                        val errorMessage = result.e.message
+                        if (errorMessage == null) {
+                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
+                        } else {
+                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage(errorMessage))
+                        }
+                        _uiState.value = AddTodoScreenState.Success
+                    }
+                }
             }
         }
 

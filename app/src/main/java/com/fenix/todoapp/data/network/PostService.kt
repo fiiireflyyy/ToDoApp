@@ -1,16 +1,10 @@
 package com.fenix.todoapp.data.network
 
-import android.util.Log
-import com.fenix.todoapp.data.Result
 import com.fenix.todoapp.data.network.dto.PostTodo
 import com.fenix.todoapp.data.network.dto.Response
 import com.fenix.todoapp.data.network.dto.TodoItemDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.plugins.RedirectResponseException
-import io.ktor.client.plugins.ResponseException
-import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -22,7 +16,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
 import javax.inject.Inject
-
+/**
+ * [PostService] responsible for making network request
+ */
 class PostService @Inject constructor(
     private val client: HttpClient
 ) {
@@ -59,7 +55,6 @@ class PostService @Inject constructor(
             setBody(postItem)
         }
         val response : PostTodo = result.body()
-        Log.d("TESTLOG","status ${response.status}")
         return response.status
     }
 

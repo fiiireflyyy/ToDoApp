@@ -8,22 +8,21 @@ import com.fenix.todoapp.data.Result
 import com.fenix.todoapp.data.repository.TodoItemsRepository
 import com.fenix.todoapp.domain.model.TodoItem
 import com.fenix.todoapp.navigation.Screen
+import com.fenix.todoapp.ui.addTodoScreen.AddTodoScreenViewModel
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemModelUi
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenState
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenUiEffects
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
-
+/**
+ * [TodoItemsScreenViewModel] is responsible for managing the UI-related data for the Todo screen.
+ */
 
 @Singleton
 class TodoItemsScreenViewModel @Inject constructor(
@@ -44,7 +43,7 @@ class TodoItemsScreenViewModel @Inject constructor(
         loadTodoItems()
     }
 
-    private fun loadTodoItems(){
+    private fun loadTodoItems() {
         viewModelScope.launch {
             repository.todoItems.collect { todoItemsList ->
                 Log.d("TESTLOG","ВЫЗВАЛСЯ КОЛЛЕКТ")
@@ -74,14 +73,15 @@ class TodoItemsScreenViewModel @Inject constructor(
             }
         }
     }
-    fun getListFromBase(){
+
+    fun getListFromBase() {
         viewModelScope.launch {
             _todoItemsScreenUiState.value = TodoItemsScreenState.Loading
             repository.getList()
         }
     }
 
-    fun changeShowDone(value: Boolean){
+    fun changeShowDone(value: Boolean) {
         _todoItemsScreenUiState.value = TodoItemsScreenState.Success(
             todoItems = if(value){
                 todoItems.filter { !it.isDone }
@@ -93,8 +93,7 @@ class TodoItemsScreenViewModel @Inject constructor(
         )
     }
 
-
-    fun navigateToAddTodo(id: String?){
+    fun navigateToAddTodo(id: String?) {
         navController.navigate("${Screen.AddTodoScreen.route}/${id}")
     }
 
@@ -107,7 +106,7 @@ class TodoItemsScreenViewModel @Inject constructor(
         }
     }
 
-    fun deleteTodo(todoId: String){
+    fun deleteTodo(todoId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteTodo(todoId)
         }
@@ -121,7 +120,7 @@ class TodoItemsScreenViewModel @Inject constructor(
         }
     }
 
-    private fun TodoItem.toTodoItemsUiModel(): TodoItemModelUi{
+    private fun TodoItem.toTodoItemsUiModel(): TodoItemModelUi {
         return TodoItemModelUi(
             id = id,
             description = description,

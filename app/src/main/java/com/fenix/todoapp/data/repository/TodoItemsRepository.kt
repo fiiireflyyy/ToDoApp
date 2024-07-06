@@ -1,6 +1,5 @@
 package com.fenix.todoapp.data.repository
 
-import android.util.Log
 import com.fenix.todoapp.data.Result
 import com.fenix.todoapp.data.network.PostService
 import com.fenix.todoapp.domain.mapper.TodoToPostMapper
@@ -9,11 +8,12 @@ import io.ktor.client.plugins.ResponseException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
-
+/**
+ * [TodoItemsRepository] responsible for managing data
+ */
 @Singleton
 class TodoItemsRepository @Inject constructor(
     private val postService: PostService,
@@ -25,7 +25,7 @@ class TodoItemsRepository @Inject constructor(
     private val _todoItems = MutableStateFlow<Result<List<TodoItem>>?>(null)
     val todoItems: StateFlow<Result<List<TodoItem>>?> get() = _todoItems
 
-    suspend fun getList(){
+    suspend fun getList() {
         withContext(Dispatchers.IO) {
             try {
                 val list = postService.getList()
@@ -36,7 +36,7 @@ class TodoItemsRepository @Inject constructor(
             } catch (e: ResponseException) {
                 _todoItems.value = Result.Error(Exception(e.response.status.description))
             } catch (e: Exception) {
-                _todoItems.value = Result.Error(Exception(e.message))
+                _todoItems.value = Result.Error(Exception("Проверьте подключение к интернету"))
             }
         }
     }
@@ -52,7 +52,7 @@ class TodoItemsRepository @Inject constructor(
             } catch (e: ResponseException) {
                 Result.Error(Exception(e.response.status.description))
             } catch (e: Exception) {
-                Result.Error(Exception(e.message))
+                Result.Error(Exception("Ошибка добавления (проверьте подключение)"))
             }
         }
     }
@@ -73,14 +73,14 @@ class TodoItemsRepository @Inject constructor(
             _todoItems.value = Result.Success(itemsList)
             Result.Success(Unit)
         } catch (e: ResponseException) {
-            Result.Error(Exception(e.response.status.description))
+            Result.Error(Exception(("CHANGE  ${e.response.status.description}")))
         } catch (e: Exception) {
-            Result.Error(Exception(e.message))
+            Result.Error(Exception("Ошибка изменения"))
         }
     }
 
-    suspend fun changeTodoItem(item: TodoItem?){
-        withContext(Dispatchers.IO) {
+    suspend fun changeTodoItem(item: TodoItem?) :  Result<Unit> {
+        return withContext(Dispatchers.IO) {
             try {
                 val revision = postService.getRevision()
                 postService.updateTodo(mapper.mapToPost(item!!), revision.toString())
@@ -89,10 +89,11 @@ class TodoItemsRepository @Inject constructor(
                 _todoItems.value = Result.Success(
                     itemsList,
                 )
+                Result.Success(Unit)
             } catch (e: ResponseException) {
-                _todoItems.value = Result.Error(Exception(e.response.status.description))
+                Result.Error(Exception("CHANGE  ${e.response.status.description}"))
             } catch (e: Exception) {
-                _todoItems.value = Result.Error(Exception(e.message))
+                Result.Error(Exception("Ошибка изменения (проверьте подключение)"))
             }
         }
     }
@@ -110,8 +111,7 @@ class TodoItemsRepository @Inject constructor(
         }
     }
 
-
-    suspend fun deleteTodo(id: String){
+    suspend fun deleteTodo(id: String) {
         withContext(Dispatchers.IO){
             try {
                 val revision = postService.getRevision()
@@ -121,9 +121,9 @@ class TodoItemsRepository @Inject constructor(
                     itemsList,
                 )
             } catch (e: ResponseException) {
-                _todoItems.value = Result.Error(Exception("DELETE  ${e.response.status}"))
+                _todoItems.value = Result.Error(Exception("DELETE  ${e.response.status.description}"))
             } catch (e: Exception) {
-                _todoItems.value = Result.Error(Exception(e.message))
+                _todoItems.value = Result.Error(Exception("Ошибка удаления (проверьте подключение)"))
             }
         }
     }

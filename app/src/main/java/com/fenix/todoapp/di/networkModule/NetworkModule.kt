@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -12,6 +13,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
@@ -48,6 +50,16 @@ object NetworkModule {
                     }
                 }
                 level = LogLevel.ALL
+            }
+
+            install(HttpRequestRetry) {
+                maxRetries = 3
+                retryIf { request, response ->
+                    !response.status.isSuccess()
+                }
+                delayMillis { retry ->
+                    retry * 30L
+                }
             }
         }
     }
