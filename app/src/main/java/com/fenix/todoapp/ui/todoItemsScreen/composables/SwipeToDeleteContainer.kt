@@ -35,21 +35,22 @@ fun SwipeToDeleteContainer(
 
     val state = rememberSwipeToDismissBoxState(
         confirmValueChange = {
-            when(it){
+            when (it) {
                 SwipeToDismissBoxValue.EndToStart -> {
                     isRemoved = true
+                    true
                 }
                 SwipeToDismissBoxValue.StartToEnd -> {
                     onCheckedChange(item.id, true)
+                    false
                 }
-                SwipeToDismissBoxValue.Settled -> return@rememberSwipeToDismissBoxState false
+                SwipeToDismissBoxValue.Settled -> false
             }
-            return@rememberSwipeToDismissBoxState true
         }
     )
 
     LaunchedEffect(key1 = isRemoved) {
-        if(isRemoved) {
+        if (isRemoved) {
             delay(animationDuration.toLong())
             onDelete(item.id)
         }
@@ -67,7 +68,7 @@ fun SwipeToDeleteContainer(
             backgroundContent = {
                 DeleteBackGround(swipeDismissState = state, item.isDone)
             },
-            content = {content()},
+            content = { content() },
             enableDismissFromStartToEnd = !item.isDone
         )
     }

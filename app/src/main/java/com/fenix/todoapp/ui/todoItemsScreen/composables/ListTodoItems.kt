@@ -50,7 +50,7 @@ fun ListTodoItems(
     changeShowDone: (Boolean) -> Unit,
     onDelete: (String) -> Unit,
     navigateToAddTodo: (String?) -> Unit,
-){
+) {
 
     Scaffold(
         floatingActionButton = {
@@ -112,7 +112,7 @@ fun ListTodoItems(
                         IconButton(
                             onClick = { changeShowDone(!isShowDone) },
                         ) {
-                            if (isShowDone){
+                            if (isShowDone) {
                                 Icon(
                                     modifier = Modifier
                                         .size(24.dp),
@@ -120,8 +120,7 @@ fun ListTodoItems(
                                     tint = MaterialTheme.colorScheme.blue,
                                     contentDescription = ""
                                 )
-                            }
-                            else {
+                            } else {
                                 Icon(
                                     modifier = Modifier
                                         .size(24.dp),
@@ -154,7 +153,7 @@ fun ListTodoItems(
                     modifier = Modifier.background(MaterialTheme.colorScheme.backSecond)
                 ) {
                     items(todoItems,
-                        key = {it.id}
+                        key = { it.id }
                     ) { item ->
                         SwipeToDeleteContainer(
                             item = item,
