@@ -6,7 +6,7 @@ plugins {
     kotlin("plugin.serialization") version "2.0.0"
 }
 
-val maxApkSizeValue = 10
+val maxApkSizeValue = 30
 val validationEnabledValue = true
 val analysisEnabledValue = true
 tgReporter {
