@@ -40,4 +40,18 @@ class TelegramApi(
             parameter("text", message)
         }
     }
+
+    suspend fun sendFile(file: File, filename: String, token: String, chatId: String): HttpResponse {
+        val body = MultiPartFormDataContent(
+            formData {
+                append("document", file.readBytes(), Headers.build {
+                    append(HttpHeaders.ContentDisposition, "filename=${filename.escapeIfNeeded()}")
+                })
+            }
+        )
+        return httpClient.post("$BASE_URL/bot$token/sendDocument") {
+            parameter("chat_id", chatId)
+            setBody(body)
+        }
+    }
 }

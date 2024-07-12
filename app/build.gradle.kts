@@ -6,9 +6,15 @@ plugins {
     kotlin("plugin.serialization") version "2.0.0"
 }
 
+val maxApkSizeValue = 20
+val validationEnabledValue = true
+val analysisEnabledValue = true
 tgReporter {
     token.set(providers.environmentVariable("TG_TOKEN"))
     chatId.set(providers.environmentVariable("TG_CHAT"))
+    maxApkSize.set(maxApkSizeValue)
+    validationEnabled.set(validationEnabledValue)
+    analysisEnabled.set(analysisEnabledValue)
 }
 
 
