@@ -40,6 +40,18 @@ class TelegramReporterPlugin : Plugin<Project> {
             }
 
             project.tasks.register(
+                "analyzeApkFor$name",
+                AnalyzeApkTask::class.java,
+                telegramApi,
+            ).configure {
+                dependsOn("createDebugApkListingFileRedirect")
+                token.set(extension.token)
+                chatId.set(extension.chatId)
+                apkDir.set(artifacts)
+                projectDir.set(project.projectDir)
+            }
+
+            project.tasks.register(
                 "reportTelegramApkFor${variant.name.capitalize()}",
                 TelegramReporterTask::class.java,
                 telegramApi
@@ -59,18 +71,6 @@ class TelegramReporterPlugin : Plugin<Project> {
                     finalizedBy("analyzeApkFor$name")
                 }
             }
-
-            project.tasks.register(
-                "analyzeApkFor$name",
-                AnalyzeApkTask::class.java,
-                telegramApi,
-            ).configure {
-                token.set(extension.token)
-                chatId.set(extension.chatId)
-                apkDir.set(artifacts)
-                projectDir.set(project.projectDir)
-            }
-
         }
     }
 }
