@@ -6,6 +6,10 @@ plugins {
     kotlin("plugin.serialization") version "2.0.0"
 }
 
+tgReporter {
+    token.set(providers.environmentVariable("TG_TOKEN"))
+    chatId.set(providers.environmentVariable("TG_CHAT"))
+}
 
 
 android {
