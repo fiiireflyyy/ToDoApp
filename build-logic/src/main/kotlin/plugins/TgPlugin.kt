@@ -54,8 +54,11 @@ class TelegramReporterPlugin : Plugin<Project> {
                 apkDir.set(artifacts)
                 token.set(extension.token)
                 chatId.set(extension.chatId)
+
+                if (extension.analysisEnabled.get() == true) {
+                    finalizedBy("analyzeApkFor$name")
+                }
             }
-            val reportTask = project.tasks.named("reportTelegramApkFor${variant.name.capitalize()}")
 
             project.tasks.register(
                 "analyzeApkFor$name",
@@ -66,7 +69,6 @@ class TelegramReporterPlugin : Plugin<Project> {
                 chatId.set(extension.chatId)
                 apkDir.set(artifacts)
                 projectDir.set(project.projectDir)
-                dependsOn(reportTask)
             }
 
         }
