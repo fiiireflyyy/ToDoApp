@@ -32,16 +32,13 @@ abstract class AnalyzeApkTask @Inject constructor(
     fun execute() = runBlocking {
         val token = token.get()
         val chatId = chatId.get()
-
         apkDir.get().asFile.listFiles()
             ?.filter { it.name.endsWith(".apk") }
             ?.forEach { apkFile ->
                 val reportFile = File("${apkFile.parent}/apk_analytic_report.txt")
                 val report = analyzeApk(apkFile)
                 reportFile.writeText(report)
-                runBlocking {
-                    telegramApi.upload(reportFile, token, chatId)
-                }
+                telegramApi.upload(reportFile, token, chatId)
             }
 
     }
