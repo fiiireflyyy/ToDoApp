@@ -40,18 +40,6 @@ class TelegramReporterPlugin : Plugin<Project> {
             }
 
             project.tasks.register(
-                "analyzeApkFor$name",
-                AnalyzeApkTask::class.java,
-                telegramApi,
-            ).configure {
-                dependsOn("createDebugApkListingFileRedirect")
-                token.set(extension.token)
-                chatId.set(extension.chatId)
-                apkDir.set(artifacts)
-                projectDir.set(project.projectDir)
-            }
-
-            project.tasks.register(
                 "reportTelegramApkFor${variant.name.capitalize()}",
                 TelegramReporterTask::class.java,
                 telegramApi
@@ -66,11 +54,21 @@ class TelegramReporterPlugin : Plugin<Project> {
                 apkDir.set(artifacts)
                 token.set(extension.token)
                 chatId.set(extension.chatId)
-
-                if (extension.analysisEnabled.get() == true) {
-                    finalizedBy("analyzeApkFor$name")
-                }
             }
+            val reportTask = project.tasks.named("reportTelegramApkFor${variant.name.capitalize()}")
+
+            project.tasks.register(
+                "analyzeApkFor$name",
+                AnalyzeApkTask::class.java,
+                telegramApi,
+            ).configure {
+                token.set(extension.token)
+                chatId.set(extension.chatId)
+                apkDir.set(artifacts)
+                projectDir.set(project.projectDir)
+                dependsOn(reportTask)
+            }
+
         }
     }
 }
@@ -80,5 +78,5 @@ interface TelegramExtension {
     val token: Property<String>
     val maxApkSize: Property<Int>
     val validationEnabled: Property<Boolean>
-    val analysisEnabled: Property<Boolean>
+    val analysisEnabledValue: Property<Boolean>
 }
