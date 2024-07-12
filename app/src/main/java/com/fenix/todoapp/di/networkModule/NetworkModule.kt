@@ -1,6 +1,7 @@
 package com.fenix.todoapp.di.networkModule
 
 import android.util.Log
+import com.fenix.todoapp.di.app.AppScope
 import dagger.Module
 import dagger.Provides
 import io.ktor.client.HttpClient
@@ -22,7 +23,7 @@ import javax.inject.Singleton
 object NetworkModule {
 
     @Provides
-    @Singleton
+    @AppScope
     fun provideHttpClient(): HttpClient {
         return HttpClient(Android){
             install(ContentNegotiation){

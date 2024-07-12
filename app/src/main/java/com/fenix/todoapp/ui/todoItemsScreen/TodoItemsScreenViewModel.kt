@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.fenix.todoapp.data.Result
 import com.fenix.todoapp.data.repository.TodoItemsRepository
+import com.fenix.todoapp.di.todoItemsScreen.TodoItemsScope
 import com.fenix.todoapp.domain.model.TodoItem
+import com.fenix.todoapp.navigation.NavManager
 import com.fenix.todoapp.navigation.Screen
 import com.fenix.todoapp.ui.addTodoScreen.AddTodoScreenViewModel
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemModelUi
@@ -24,10 +26,10 @@ import javax.inject.Singleton
  * [TodoItemsScreenViewModel] is responsible for managing the UI-related data for the Todo screen.
  */
 
-@Singleton
+@TodoItemsScope
 class TodoItemsScreenViewModel @Inject constructor(
-    private val navController: NavController,
     private val repository: TodoItemsRepository,
+    private val navManager: NavManager,
 ) : ViewModel(){
 
     private var todoItems = listOf<TodoItemModelUi>()
@@ -94,7 +96,7 @@ class TodoItemsScreenViewModel @Inject constructor(
     }
 
     fun navigateToAddTodo(id: String?) {
-        navController.navigate("${Screen.AddTodoScreen.route}/${id}")
+        navManager.navigateToAddFragment(id)
     }
 
     fun updateTodoItem(id: String, isDone: Boolean) {

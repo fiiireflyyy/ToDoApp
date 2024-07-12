@@ -1,13 +1,16 @@
 package com.fenix.todoapp.ui.addTodoScreen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.fenix.todoapp.data.Result
 import com.fenix.todoapp.data.repository.TodoItemsRepository
+import com.fenix.todoapp.di.addTodoScreen.AddTodoScope
 import com.fenix.todoapp.domain.mapper.TodoToPostMapper
 import com.fenix.todoapp.domain.model.Importance
 import com.fenix.todoapp.domain.model.TodoItem
+import com.fenix.todoapp.navigation.NavManager
 import com.fenix.todoapp.navigation.Screen
 import com.fenix.todoapp.ui.addTodoScreen.state.AddTodoScreenState
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenUiEffects
@@ -16,17 +19,20 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.Date
 import javax.inject.Inject
+
 /**
  * [AddTodoScreenViewModel] is responsible for managing the UI-related data for the Add Todo screen.
  */
+@AddTodoScope
 class AddTodoScreenViewModel @Inject constructor(
     private val repository: TodoItemsRepository,
-    private val navController: NavController,
-    ) : ViewModel() {
+    private val navManager: NavManager,
+) : ViewModel() {
 
     private val _importance = MutableStateFlow<Importance>(Importance.Medium)
     val importance = _importance.asStateFlow()
@@ -40,10 +46,6 @@ class AddTodoScreenViewModel @Inject constructor(
     private var _canDelete = MutableStateFlow(false)
     val canDelete = _canDelete.asStateFlow()
 
-    private val todoId: String? = navController
-        .getBackStackEntry("${Screen.AddTodoScreen.route}/{todoid}")
-        .arguments
-        ?.getString("todoid")
 
     private val _uiState = MutableStateFlow<AddTodoScreenState>(AddTodoScreenState.Loading)
     val uiState = _uiState.asStateFlow()
@@ -57,10 +59,12 @@ class AddTodoScreenViewModel @Inject constructor(
         getChangeItem()
     }
 
-    private fun getChangeItem(){
-        if (todoId != null){
-            viewModelScope.launch(Dispatchers.IO) {
-                when (val result = repository.getItemById(todoId)) {
+    private fun getChangeItem() {
+        viewModelScope.launch {
+            navManager.todoItemId.collect { id ->
+                if (id != null) {
+                    Log.d("TESTLOG","my id${id}")
+                    when (val result = repository.getItemById(id)) {
                         is Result.Success -> {
                             _uiState.value = AddTodoScreenState.Success
                             val currentTodoItem = result.data
@@ -70,27 +74,28 @@ class AddTodoScreenViewModel @Inject constructor(
                             _description.value = currentTodoItem.description
                             _deadline.value = currentTodoItem.deadline
                         }
+
                         is Result.Error -> {
                             _uiState.value = AddTodoScreenState.Error(result.e.toString())
                         }
                     }
+                } else {
+                    _uiState.value = AddTodoScreenState.Success
+                    _canDelete.value = false
                 }
             }
-        else{
-            _uiState.value = AddTodoScreenState.Success
-            _canDelete.value = false
         }
     }
 
-    fun setDescription(value: String){
+    fun setDescription(value: String) {
         _description.value = value
     }
 
-    fun setImportance(value: Importance){
+    fun setImportance(value: Importance) {
         _importance.value = value
     }
 
-    fun setDeadline(value: Date?){
+    fun setDeadline(value: Date?) {
         _deadline.value = value
     }
 
@@ -145,14 +150,18 @@ class AddTodoScreenViewModel @Inject constructor(
 
     }
 
-    fun deleteTodo(){
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteTodo(todoId!!)
+    fun deleteTodo() {
+        viewModelScope.launch {
+            navManager.todoItemId.collect { id ->
+                if (id != null)
+                    repository.deleteTodo(id)
+            }
+
         }
     }
 
     fun navigateBack() {
-        navController.popBackStack()
+        navManager.navigateBack()
     }
 
 }

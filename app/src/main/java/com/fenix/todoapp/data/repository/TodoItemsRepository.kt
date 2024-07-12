@@ -2,6 +2,7 @@ package com.fenix.todoapp.data.repository
 
 import com.fenix.todoapp.data.Result
 import com.fenix.todoapp.data.network.PostService
+import com.fenix.todoapp.di.activity.MainActivityScope
 import com.fenix.todoapp.domain.mapper.TodoToPostMapper
 import com.fenix.todoapp.domain.model.TodoItem
 import io.ktor.client.plugins.ResponseException
@@ -14,7 +15,7 @@ import javax.inject.Singleton
 /**
  * [TodoItemsRepository] responsible for managing data
  */
-@Singleton
+@MainActivityScope
 class TodoItemsRepository @Inject constructor(
     private val postService: PostService,
     private val mapper: TodoToPostMapper,

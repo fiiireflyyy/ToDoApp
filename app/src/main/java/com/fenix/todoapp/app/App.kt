@@ -1,13 +1,16 @@
 package com.fenix.todoapp.app
 
 import android.app.Application
-import com.fenix.todoapp.data.repository.TodoItemsRepository
 import com.fenix.todoapp.di.app.AppComponent
 import com.fenix.todoapp.di.app.DaggerAppComponent
 
-class App: Application() {
+class App : Application() {
 
-    val appComponent: AppComponent by lazy {
-        DaggerAppComponent.create()
+    lateinit var appComponent: AppComponent
+        private set
+
+    override fun onCreate() {
+        super.onCreate()
+        appComponent = DaggerAppComponent.create()
     }
 }
