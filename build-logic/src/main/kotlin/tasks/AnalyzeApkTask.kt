@@ -9,11 +9,12 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import plugins.TelegramApi
 import java.io.File
+import java.io.FileWriter
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
 abstract class AnalyzeApkTask @Inject constructor(
-    private val telegramApi: TelegramApi
+    private val tgApi: TelegramApi
 ) : DefaultTask() {
 
     @get:InputDirectory
@@ -32,28 +33,33 @@ abstract class AnalyzeApkTask @Inject constructor(
     fun execute() = runBlocking {
         val token = token.get()
         val chatId = chatId.get()
-        apkDir.get().asFile.listFiles()
-            ?.filter { it.name.endsWith(".apk") }
-            ?.forEach { apkFile ->
-                val reportFile = File("${apkFile.parent}/apk_analytic_report.txt")
-                val report = analyzeApk(apkFile)
-                reportFile.writeText(report)
-                telegramApi.upload(reportFile, token, chatId)
-            }
 
-    }
-
-    private fun analyzeApk(apkFile: File): String {
+        val apkFile = apkDir.get().asFile.listFiles()?.first { it.name.endsWith(".apk") }!!
         val zipFile = ZipFile(apkFile)
-        val report = StringBuilder()
+        val entries = zipFile.entries()
+        val details = mutableListOf<String>()
 
-        zipFile.entries().asSequence().forEach { entry ->
-            if (!entry.isDirectory) {
-                val sizeMb = entry.size / (1024.0 * 1024.0)
-                report.append("- ${entry.name} ${"%.2f".format(sizeMb)} Mb\n")
+        entries.asSequence().sortedByDescending { it.size }.forEach { entry ->
+            val sizeInBytes = entry.size
+            val formattedSize = if (sizeInBytes < 1024 * 1024) {
+                "${"%.2f".format(sizeInBytes.toDouble() / 1024)} KB"
+            } else {
+                "${"%.2f".format(sizeInBytes.toDouble() / (1024 * 1024))} MB"
             }
+            details.add("- ${entry.name} $formattedSize")
         }
-        return report.toString()
+
+        zipFile.close()
+
+        val projectDir = projectDir.get().asFile
+        val outputPath = "${projectDir}/../build-logic/apk-analysis-report.txt"
+        val reportFile = File(outputPath)
+        FileWriter(reportFile).use { writer ->
+            writer.write("APK Contents:\n")
+            details.forEach { writer.write("$it\n") }
+        }
+        tgApi.sendFile(file = reportFile, filename = outputPath, token = token, chatId = chatId)
+        reportFile.delete()
     }
 
 }

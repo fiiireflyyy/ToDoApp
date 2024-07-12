@@ -1,5 +1,6 @@
 package tasks
 
+import AndroidConsts
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -10,8 +11,9 @@ import org.gradle.api.tasks.TaskAction
 import plugins.TelegramApi
 import javax.inject.Inject
 
+
 abstract class TelegramReporterTask @Inject constructor(
-    private val telegramApi: TelegramApi
+    private val tgApi: TelegramApi,
 ) : DefaultTask() {
 
     @get:InputDirectory
@@ -27,34 +29,28 @@ abstract class TelegramReporterTask @Inject constructor(
     abstract val sizeStr: Property<String>
 
     @TaskAction
-    fun report() {
+    fun execute(): Unit = runBlocking {
         val token = token.get()
         val chatId = chatId.get()
         val sizeStr = sizeStr.get()
 
         val apkFile = apkDir.get().asFile.listFiles()?.first { it.name.endsWith(".apk") }!!
-        val variant = getVariantApkName(apkFile.name)
+
+        val variant = getVariantFromApkName(apkFile.name)
         val name = "todolist-$variant-${AndroidConsts.VERSION_CODE}.apk"
-        runBlocking {
-            telegramApi.sendMessage("Build finished", token, chatId).apply {
-                println("Status = $status")
-            }
-        }
-        runBlocking {
-            telegramApi.sendFile(apkFile, name, token, chatId).apply {
-                println("Status = $status")
-            }
-        }
+
+        tgApi.sendMessage(message = "Build finished", token = token, chatId = chatId)
+        tgApi.sendFile(file = apkFile, filename = name, token = token, chatId = chatId)
         if (sizeStr.isNotEmpty()) {
-            runBlocking {
-                telegramApi.sendMessage(sizeStr, token, chatId)
-            }
+            tgApi.sendMessage(message = sizeStr, token = token, chatId = chatId)
+        }
+
+    }
+
+    private fun getVariantFromApkName(name: String): String {
+        val withoutExtension = name.removeSuffix(".apk")
+        val withoutPrefix = withoutExtension.removePrefix("app-")
+        return withoutPrefix
     }
 }
 
-private fun getVariantApkName(name: String): String {
-    val withoutExtension = name.removeSuffix(".apk")
-    val withoutAppPrefix = withoutExtension.removePrefix("app-")
-    return withoutAppPrefix
-}
-}
