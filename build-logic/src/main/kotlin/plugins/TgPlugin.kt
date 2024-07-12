@@ -78,5 +78,5 @@ interface TelegramExtension {
     val token: Property<String>
     val maxApkSize: Property<Int>
     val validationEnabled: Property<Boolean>
-    val analysisEnabledValue: Property<Boolean>
+    val analysisEnabled: Property<Boolean>
 }
