@@ -76,7 +76,7 @@ object NetworkModule {
         return Room.databaseBuilder(
             context.applicationContext,
             TodoDatabase::class.java,
-            "todoo.db"
+            "todo.db"
         )
             .build()
     }
