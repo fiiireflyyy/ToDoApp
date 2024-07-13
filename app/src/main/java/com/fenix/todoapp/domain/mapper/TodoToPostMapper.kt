@@ -1,7 +1,9 @@
 package com.fenix.todoapp.domain.mapper
 
-import com.fenix.todoapp.data.network.dto.PostTodo
+import com.fenix.todoapp.data.dp.TodoItemEntity
+import com.fenix.todoapp.data.network.dto.PatchPost
 import com.fenix.todoapp.data.network.dto.TodoItemDto
+import com.fenix.todoapp.data.network.dto.TodoItemPost
 import com.fenix.todoapp.domain.model.Importance
 import com.fenix.todoapp.domain.model.TodoItem
 import java.time.Instant
@@ -14,52 +16,75 @@ import javax.inject.Inject
  */
 class TodoToPostMapper @Inject constructor() {
 
-    fun mapToPost(todoItem: TodoItem) : PostTodo {
-        return PostTodo(
+    fun mapModelToPost(todoItem: TodoItem): TodoItemPost {
+        return TodoItemPost(
             status = "ok",
-            element = mapToDto(todoItem)
-        )
-    }
-    fun mapToDto(todoItem: TodoItem) : TodoItemDto {
-        return TodoItemDto(
-            id = todoItem.id,
-            text = todoItem.description,
-            importance = todoItem.importance.level,
-            color = "#FFFFFF",
-            deadLine = todoItem.deadline?.toUnixTimestamp(),
-            isCompleted = todoItem.isDone,
-            creationDate =  todoItem.creationDate.toUnixTimestamp(),
-            refactorDate = todoItem.creationDate.toUnixTimestamp(),
-            byPhone = "1",
+            todoItemDto = mapModelToDto(todoItem)
         )
     }
 
-    fun mapDtoToLocal(todoItemDto: TodoItemDto) : TodoItem {
-        return TodoItem(
-            id = todoItemDto.id,
-            description = todoItemDto.text,
-            importance = todoItemDto.importance.toImportance(),
-            deadline = todoItemDto.deadLine?.toDate(),
-            isDone = todoItemDto.isCompleted,
-            creationDate = todoItemDto.creationDate.toLocalDateTime(),
+    fun mapModelToDto(todoItem: TodoItem): TodoItemDto {
+        return TodoItemDto(
+            id = todoItem.id,
+            text = todoItem.text,
+            importance = todoItem.importance.toStringImportance(),
+            color = "#FFFFFF",
+            deadLine = todoItem.deadline,
+            isCompleted = todoItem.isCompleted,
+            dateOfCreation = todoItem.dateOfCreation,
+            dateOfChange = todoItem.dateOfChange,
+            user = "1",
         )
     }
+
+    fun mapDtoToModel(todoItemDto: TodoItemDto): TodoItem {
+        return TodoItem(
+            id = todoItemDto.id,
+            text = todoItemDto.text,
+            importance = todoItemDto.importance.toImportance(),
+            deadline = todoItemDto.deadLine,
+            isCompleted = todoItemDto.isCompleted,
+            dateOfCreation = todoItemDto.dateOfCreation,
+            dateOfChange = todoItemDto.dateOfChange,
+        )
+    }
+
+    fun mapEntityToModel(todoItemEntity: TodoItemEntity): TodoItem {
+        return TodoItem(
+            id = todoItemEntity.id,
+            text = todoItemEntity.text,
+            importance = todoItemEntity.importance.toImportance(),
+            deadline = todoItemEntity.deadLine,
+            isCompleted = todoItemEntity.isCompleted,
+            dateOfCreation = todoItemEntity.creationDate,
+            dateOfChange = todoItemEntity.refactorDate,
+        )
+    }
+
+    fun mapModelToEntity(todoItem: TodoItem): TodoItemEntity{
+        return TodoItemEntity(
+            id = todoItem.id,
+            text = todoItem.text,
+            importance = todoItem.importance.toStringImportance(),
+            deadLine = todoItem.deadline,
+            isCompleted = todoItem.isCompleted,
+            creationDate = todoItem.dateOfCreation,
+            refactorDate = todoItem.dateOfChange,
+            device = "1"
+        )
+    }
+
 }
-fun LocalDateTime.toUnixTimestamp(): Long {
-    return this.atZone(ZoneId.systemDefault()).toEpochSecond()
-}
-fun Long.toLocalDateTime(): LocalDateTime {
-    return LocalDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneId.systemDefault())
-}
-fun Date.toUnixTimestamp(): Long {
-    return this.time / 1000
-}
-fun Long.toDate(): Date {
-    return Date(this * 1000)
-}
-fun String.toImportance(): Importance = when (this.lowercase()) {
+
+private fun String.toImportance(): Importance = when (this.lowercase()) {
     "low" -> Importance.Low
     "basic" -> Importance.Medium
     "important" -> Importance.High
     else -> throw IllegalArgumentException("Unknown importance level: $this")
+}
+
+private fun Importance.toStringImportance(): String = when (this) {
+    is Importance.Low -> "low"
+    is Importance.Medium -> "basic"
+    is Importance.High -> "important"
 }

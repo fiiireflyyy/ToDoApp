@@ -1,5 +1,6 @@
 package com.fenix.todoapp.ui.todoItemsScreen
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,6 +21,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 /**
@@ -48,38 +53,29 @@ class TodoItemsScreenViewModel @Inject constructor(
     private fun loadTodoItems() {
         viewModelScope.launch {
             repository.todoItems.collect { todoItemsList ->
-                Log.d("TESTLOG","ВЫЗВАЛСЯ КОЛЛЕКТ")
                 val currentTodoItemsScreenUiState = todoItemsScreenUiState.value
                 val isShowDone = when(currentTodoItemsScreenUiState){
                     is TodoItemsScreenState.Success -> currentTodoItemsScreenUiState.isShowDone
                     else -> false
                 }
-                when (todoItemsList) {
-                    is Result.Success -> {
-                        todoItems = todoItemsList.data.map { it.toTodoItemsUiModel() }
-                        val itemsToShow = if (isShowDone) todoItems.filter { !it.isDone } else todoItems
-                        _todoItemsScreenUiState.value = TodoItemsScreenState.Success(
-                            todoItems = itemsToShow,
-                            completedCount = todoItems.count { it.isDone },
-                            isShowDone = isShowDone,
-                        )
-                    }
-                    is Result.Error -> {
-                        emitErrorMessage(todoItemsList.e.message)
-                        _todoItemsScreenUiState.value = TodoItemsScreenState.Error
-                    }
-                    null -> {
-                        _todoItemsScreenUiState.value = TodoItemsScreenState.Loading
-                    }
-                }
+                todoItems = todoItemsList.map { it.toTodoItemsUiModel() }
+                _todoItemsScreenUiState.value = TodoItemsScreenState.Success(
+                    todoItems = if (isShowDone) {
+                        todoItems.filter { !it.isDone }
+                    } else{
+                        todoItems
+                    },
+                    completedCount = todoItems.count { it.isDone },
+                    isShowDone = isShowDone,
+                )
+
             }
         }
     }
 
     fun getListFromBase() {
         viewModelScope.launch {
-            _todoItemsScreenUiState.value = TodoItemsScreenState.Loading
-            repository.getList()
+            repository.getTodoItems()
         }
     }
 
@@ -100,36 +96,54 @@ class TodoItemsScreenViewModel @Inject constructor(
     }
 
     fun updateTodoItem(id: String, isDone: Boolean) {
+        val currentDateMillis = Calendar.getInstance().timeInMillis
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = repository.updateTodoItem(id, isDone)) {
-                is Result.Success -> {}
-                is Result.Error -> emitErrorMessage(result.e.message)
+            val result = repository.updateCompleted(
+                id =  id,
+                isCompleted = isDone,
+                dateOfChange = currentDateMillis,
+            )
+            if (result.isFailure){
+                _uiEffectFlow.emit(
+                    TodoItemsScreenUiEffects.CustomMessage("изменено локально")
+                )
             }
         }
     }
 
     fun deleteTodo(todoId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteTodo(todoId)
-        }
-    }
-
-    private suspend fun emitErrorMessage(message: String?) {
-        if (message == null) {
-            _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
-        } else {
-            _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage(message))
+            val result = repository.deleteTodoItem(todoId)
+            if (result.isFailure){
+                _uiEffectFlow.emit(
+                    TodoItemsScreenUiEffects.CustomMessage("изменено локально")
+                )
+            }
         }
     }
 
     private fun TodoItem.toTodoItemsUiModel(): TodoItemModelUi {
         return TodoItemModelUi(
             id = id,
-            description = description,
-            isDone = isDone,
+            description = text,
+            isDone = isCompleted,
             importance = importance,
-            deadline = deadline,
+            deadline = DateFormatting.toFormattedDate(deadline),
         )
+    }
+
+    object DateFormatting {
+
+        private const val DATE_PATTERN = "dd MMM yyyy"
+        @SuppressLint("ConstantLocale")
+        private val formatter = SimpleDateFormat(DATE_PATTERN, Locale.getDefault())
+
+        fun toFormattedDate(dateLong: Long?): String? =
+            dateLong?.let { formatter.format(Date(it)) }
+
+        fun toDateLong(dateString: String?): Long? =
+            dateString?.let { formatter.parse(it)?.time ?: 0L }
+
     }
 
 }

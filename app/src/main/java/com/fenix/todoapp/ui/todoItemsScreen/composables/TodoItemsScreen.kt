@@ -44,9 +44,7 @@ fun TodoItemsScreen(viewModel: TodoItemsScreenViewModel) {
             onDelete = viewModel::deleteTodo,
             navigateToAddTodo = viewModel::navigateToAddTodo,
         )
-        is TodoItemsScreenState.Error -> ShowUpdateBtn(
-            onClick = viewModel::getListFromBase
-        )
+        is TodoItemsScreenState.Error -> {}
     }
 }
 

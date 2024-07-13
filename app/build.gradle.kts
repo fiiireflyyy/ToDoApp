@@ -100,4 +100,9 @@ dependencies {
 
     //workManager
     implementation(libs.androidx.work.runtime.ktx)
+
+    //room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
 }

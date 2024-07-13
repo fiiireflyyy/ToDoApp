@@ -5,10 +5,22 @@ import java.util.Date
 
 data class TodoItem(
     val id: String,
-    val description: String,
+    val text: String,
+    val deadline: Long?,
     val importance: Importance,
-    val isDone: Boolean,
-    val creationDate: LocalDateTime,
-    val deadline: Date? = null,
-    val changeDate: LocalDateTime? = null,
-)
+    val isCompleted: Boolean,
+    val dateOfCreation: Long,
+    val dateOfChange: Long?,
+) {
+    companion object {
+        val defaultTodoItem = TodoItem(
+            id = "",
+            text = "",
+            deadline = null,
+            importance = Importance.Medium,
+            isCompleted = false,
+            dateOfCreation = 0L,
+            dateOfChange = null,
+        )
+    }
+}

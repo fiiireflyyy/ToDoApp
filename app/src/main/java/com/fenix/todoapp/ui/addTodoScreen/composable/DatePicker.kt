@@ -3,10 +3,9 @@ package com.fenix.todoapp.ui.addTodoScreen.composable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import java.util.Calendar
-import java.util.Date
 
 @Composable
-fun DatePickerDialogc(onDateSelected: (Date) -> Unit, onDismissRequest: () -> Unit){
+fun DatePickerDialogc(onDateSelected: (Long) -> Unit, onDismissRequest: () -> Unit){
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
@@ -16,7 +15,7 @@ fun DatePickerDialogc(onDateSelected: (Date) -> Unit, onDismissRequest: () -> Un
         context,
         { _, year, month, dayOfMonth ->
             calendar.set(year, month, dayOfMonth)
-            onDateSelected(calendar.time)
+            onDateSelected(calendar.time.time)
         },
         calendar.get(Calendar.YEAR),
         calendar.get(Calendar.MONTH),

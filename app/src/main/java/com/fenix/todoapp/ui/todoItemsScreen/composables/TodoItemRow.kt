@@ -123,7 +123,7 @@ fun TodoItemRow(
                 )
                 if (item.deadline != null){
                     Text(
-                        text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(item.deadline),
+                        text = item.deadline,
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         lineHeight = 20.sp,

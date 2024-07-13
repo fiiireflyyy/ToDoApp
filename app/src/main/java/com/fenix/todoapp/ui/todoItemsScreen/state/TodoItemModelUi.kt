@@ -8,5 +8,5 @@ data class TodoItemModelUi(
     val description: String,
     val isDone: Boolean,
     val importance: Importance,
-    val deadline: Date? = null,
+    val deadline: String?,
 )

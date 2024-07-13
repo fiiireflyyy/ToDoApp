@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -40,7 +41,7 @@ class AddTodoScreenViewModel @Inject constructor(
     private val _description = MutableStateFlow<String>("")
     val description = _description.asStateFlow()
 
-    private val _deadline = MutableStateFlow<Date?>(null)
+    private val _deadline = MutableStateFlow<Long?>(null)
     val deadline = _deadline.asStateFlow()
 
     private var _canDelete = MutableStateFlow(false)
@@ -63,22 +64,19 @@ class AddTodoScreenViewModel @Inject constructor(
         viewModelScope.launch {
             navManager.todoItemId.collect { id ->
                 if (id != null) {
-                    Log.d("TESTLOG","my id${id}")
-                    when (val result = repository.getItemById(id)) {
-                        is Result.Success -> {
-                            _uiState.value = AddTodoScreenState.Success
-                            val currentTodoItem = result.data
-                            todoItem = currentTodoItem
-                            _canDelete.value = true
-                            _importance.value = currentTodoItem.importance
-                            _description.value = currentTodoItem.description
-                            _deadline.value = currentTodoItem.deadline
-                        }
+                    val result = repository.getItem(id)
+                    if (result.isSuccess) {
+                        _uiState.value = AddTodoScreenState.Success
+                        val currentTodoItem = result.getOrThrow()
+                        todoItem = currentTodoItem
+                        _canDelete.value = true
+                        _importance.value = currentTodoItem.importance
+                        _description.value = currentTodoItem.text
+                        _deadline.value = currentTodoItem.deadline
 
-                        is Result.Error -> {
-                            _uiState.value = AddTodoScreenState.Error(result.e.toString())
-                        }
+
                     }
+
                 } else {
                     _uiState.value = AddTodoScreenState.Success
                     _canDelete.value = false
@@ -95,68 +93,67 @@ class AddTodoScreenViewModel @Inject constructor(
         _importance.value = value
     }
 
-    fun setDeadline(value: Date?) {
+    fun setDeadline(value: Long?) {
         _deadline.value = value
     }
 
     fun changeTodoItem() {
         viewModelScope.launch {
+            val currentDateMillis = Calendar.getInstance().timeInMillis
             val currentTodoItem = todoItem
             if (currentTodoItem == null) {
                 val newItem = TodoItem(
                     id = LocalDateTime.now().toString(),
-                    description = description.value,
+                    text = description.value,
                     importance = importance.value,
-                    isDone = false,
-                    creationDate = LocalDateTime.now(),
-                    deadline = deadline.value
+                    isCompleted = false,
+                    dateOfChange = currentDateMillis,
+                    deadline = deadline.value,
+                    dateOfCreation = currentDateMillis,
                 )
                 _uiState.value = AddTodoScreenState.Loading
 
-                when (val result = repository.addTodoItem(newItem)) {
-                    is Result.Success -> navigateBack()
-                    is Result.Error -> {
-                        val errorMessage = result.e.message
-                        if (errorMessage == null) {
-                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
-                        } else {
-                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage(errorMessage))
-                        }
-                        _uiState.value = AddTodoScreenState.Success
-                    }
+                val result = repository.addTodoItem(newItem)
+
+                if (result.isSuccess) {
+                    navigateBack()
+                } else {
+                    _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage("Локально"))
                 }
+
+                _uiState.value = AddTodoScreenState.Success
             } else {
                 _uiState.value = AddTodoScreenState.Loading
                 todoItem = currentTodoItem.copy(
-                    description = description.value,
+                    text = description.value,
                     importance = importance.value,
                     deadline = deadline.value,
-                    changeDate = LocalDateTime.now()
+                    dateOfChange = currentDateMillis
                 )
-                when (val result = repository.changeTodoItem(todoItem)) {
-                    is Result.Success -> navigateBack()
-                    is Result.Error -> {
-                        val errorMessage = result.e.message
-                        if (errorMessage == null) {
-                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.SomethingWentWrongMessage)
-                        } else {
-                            _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage(errorMessage))
-                        }
-                        _uiState.value = AddTodoScreenState.Success
-                    }
+                val result = repository.updateTodoItem(todoItem!!)
+
+                if (result.isSuccess) {
+                    navigateBack()
+                } else {
+                    _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage("Локально"))
                 }
+                _uiState.value = AddTodoScreenState.Success
             }
         }
-
     }
 
     fun deleteTodo() {
         viewModelScope.launch {
             navManager.todoItemId.collect { id ->
-                if (id != null)
-                    repository.deleteTodo(id)
+                if (id != null) {
+                    val result = repository.deleteTodoItem(id)
+                    if (result.isSuccess) {
+                        navigateBack()
+                    } else {
+                        _uiEffectFlow.emit(TodoItemsScreenUiEffects.CustomMessage("Локально"))
+                    }
+                }
             }
-
         }
     }
 

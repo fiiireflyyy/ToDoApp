@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.commit
 import com.fenix.todoapp.R
 import com.fenix.todoapp.app.App
+import com.fenix.todoapp.data.network.WorkScheduler
 import com.fenix.todoapp.di.activity.MainActivityComponent
 import com.fenix.todoapp.di.activity.MainActivityModule
 import com.fenix.todoapp.ui.todoItemsScreen.TodoItemsFragment
@@ -22,6 +23,7 @@ class MainActivity : FragmentActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        WorkScheduler.schedulerWork(this)
 
         if(savedInstanceState == null) {
             supportFragmentManager.commit {
