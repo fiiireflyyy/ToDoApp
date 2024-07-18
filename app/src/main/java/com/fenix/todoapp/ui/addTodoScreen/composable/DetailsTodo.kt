@@ -153,7 +153,7 @@ fun DetailsContent(
     viewModel: AddTodoScreenViewModel,
     description: String,
     importance: Importance,
-    deadline: Date?,
+    deadline: Long?,
     canDelete: Boolean,
     paddingValues: PaddingValues,
     scrollState: ScrollState,
@@ -209,12 +209,12 @@ fun ImportanceRow(importance: Importance, setImportance: (Importance) -> Unit) {
 
 @Composable
 fun DeadlineRow(
-    deadline: Date?,
+    deadline: Long?,
     switchState: Boolean,
     showDatePicker: Boolean,
     onSwitchStateChange: (Boolean) -> Unit,
     onShowDatePickerChange: (Boolean) -> Unit,
-    setDeadline: (Date?) -> Unit
+    setDeadline: (Long?) -> Unit
 ) {
     Row(
         modifier = Modifier

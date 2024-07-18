@@ -1,6 +1,12 @@
 package com.fenix.todoapp.di.networkModule
 
+import android.content.Context
 import android.util.Log
+import androidx.room.Room
+import com.fenix.todoapp.data.dp.TodoDao
+import com.fenix.todoapp.data.dp.TodoDatabase
+import com.fenix.todoapp.data.network.NetworkConnection
+import com.fenix.todoapp.di.app.AppScope
 import dagger.Module
 import dagger.Provides
 import io.ktor.client.HttpClient
@@ -16,16 +22,15 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import javax.inject.Singleton
 
 @Module
 object NetworkModule {
 
     @Provides
-    @Singleton
+    @AppScope
     fun provideHttpClient(): HttpClient {
-        return HttpClient(Android){
-            install(ContentNegotiation){
+        return HttpClient(Android) {
+            install(ContentNegotiation) {
                 json(
                     Json {
                         prettyPrint = true
@@ -35,7 +40,7 @@ object NetworkModule {
                 )
             }
 
-            install(Auth){
+            install(Auth) {
                 bearer {
                     loadTokens {
                         BearerTokens("Turgon", "Turgon")
@@ -63,4 +68,28 @@ object NetworkModule {
             }
         }
     }
+
+
+    @AppScope
+    @Provides
+    fun provideDataBase(context: Context): TodoDatabase {
+        return Room.databaseBuilder(
+            context.applicationContext,
+            TodoDatabase::class.java,
+            "todo.db"
+        )
+            .build()
+    }
+
+    @Provides
+    fun provideToDoDao(db: TodoDatabase): TodoDao {
+        return db.todoDao()
+    }
+
+    @Provides
+    @AppScope
+    fun provideNetworkConnection(context: Context): NetworkConnection {
+        return NetworkConnection(context)
+    }
+
 }

@@ -24,7 +24,7 @@ class NetworkRequestWorker(
     @Inject lateinit var repository: TodoItemsRepository
 
     override suspend fun doWork(): Result {
-        repository.getList()
+        repository.getTodoItems()
         return Result.success()
     }
 }
