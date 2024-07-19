@@ -60,7 +60,7 @@ fun TodoItemRow(
                 checkedCheckmarkColor = MaterialTheme.colorScheme.backSecond,
                 checkedBoxColor = MaterialTheme.colorScheme.green,
                 checkedBorderColor = MaterialTheme.colorScheme.green,
-                uncheckedCheckmarkColor = MaterialTheme.colorScheme.backSecond,
+                uncheckedCheckmarkColor = MaterialTheme.colorScheme.white,
                 uncheckedBorderColor = if (item.importance is Importance.High){
                     MaterialTheme.colorScheme.red
                 } else {
@@ -71,12 +71,12 @@ fun TodoItemRow(
                 } else{
                     MaterialTheme.colorScheme.backSecond
                 },
-                disabledBorderColor = MaterialTheme.colorScheme.backSecond,
-                disabledIndeterminateBorderColor = MaterialTheme.colorScheme.backSecond,
-                disabledCheckedBoxColor = MaterialTheme.colorScheme.backSecond,
-                disabledUncheckedBoxColor = MaterialTheme.colorScheme.backSecond,
-                disabledIndeterminateBoxColor = MaterialTheme.colorScheme.backSecond,
-                disabledUncheckedBorderColor = MaterialTheme.colorScheme.backSecond,
+                disabledBorderColor = MaterialTheme.colorScheme.white,
+                disabledIndeterminateBorderColor = MaterialTheme.colorScheme.white,
+                disabledCheckedBoxColor = MaterialTheme.colorScheme.white,
+                disabledUncheckedBoxColor = MaterialTheme.colorScheme.white,
+                disabledIndeterminateBoxColor = MaterialTheme.colorScheme.white,
+                disabledUncheckedBorderColor = MaterialTheme.colorScheme.white,
             )
         )
         Row(

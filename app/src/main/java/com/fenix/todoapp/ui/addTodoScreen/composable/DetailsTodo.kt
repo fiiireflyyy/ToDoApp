@@ -21,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -30,6 +31,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -103,7 +105,11 @@ fun DetailsTodo(viewModel: AddTodoScreenViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailsTopAppBar(viewModel: AddTodoScreenViewModel, scrollState: ScrollState, behavior: TopAppBarScrollBehavior) {
+fun DetailsTopAppBar(
+    viewModel: AddTodoScreenViewModel,
+    scrollState: ScrollState,
+    behavior: TopAppBarScrollBehavior
+) {
     TopAppBar(
         modifier = Modifier
             .shadow(if (scrollState.value == 0) 0.dp else 8.dp)
@@ -174,7 +180,14 @@ fun DetailsContent(
         )
         ImportanceRow(importance, viewModel::setImportance)
         Divider()
-        DeadlineRow(deadline, switchState, showDatePicker, onSwitchStateChange, onShowDatePickerChange, viewModel::setDeadline)
+        DeadlineRow(
+            deadline,
+            switchState,
+            showDatePicker,
+            onSwitchStateChange,
+            onShowDatePickerChange,
+            viewModel::setDeadline
+        )
         DeleteRow(
             deleteTodo = { viewModel.deleteTodo() },
             navigateBack = { viewModel.navigateBack() },

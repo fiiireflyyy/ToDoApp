@@ -26,6 +26,12 @@ class NavManager @Inject constructor(
     fun navigateToAddFragment(id: String?) {
         _todoItemId.value = id
         fragmentManager?.commit {
+            setCustomAnimations(
+                R.anim.slide_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.slide_out
+            )
             replace(R.id.fragment_container, AddTodoFragment())
             addToBackStack(null)
         }
@@ -37,12 +43,24 @@ class NavManager @Inject constructor(
 
     fun navigateToMainScreen() {
         fragmentManager?.commit {
+            setCustomAnimations(
+                R.anim.slide_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.slide_out
+            )
             replace(R.id.fragment_container, TodoItemsFragment())
         }
     }
 
     fun navigateToSettingsThemeScreen() {
         fragmentManager?.commit {
+            setCustomAnimations(
+                R.anim.slide_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.slide_out
+            )
             replace(R.id.fragment_container, SettingsThemeFragment())
             addToBackStack(null)
         }
