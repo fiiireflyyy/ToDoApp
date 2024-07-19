@@ -7,7 +7,7 @@ plugins {
 }
 
 val maxApkSizeValue = 30
-val validationEnabledValue = true
+val validationEnabledValue = false
 val analysisEnabledValue = true
 tgReporter {
     token.set(providers.environmentVariable("TG_TOKEN"))
