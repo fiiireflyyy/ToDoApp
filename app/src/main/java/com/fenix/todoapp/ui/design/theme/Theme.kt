@@ -29,55 +29,55 @@ private val DarkColorScheme = darkColorScheme(
 
 val ColorScheme.blue: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) ColorBlueDarkColor else ColorBlueLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) ColorBlueDarkColor else ColorBlueLightColor
 
 val ColorScheme.red: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) ColorRedDarkColor else ColorRedLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) ColorRedDarkColor else ColorRedLightColor
 
 val ColorScheme.green: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) ColorGreenDarkColor else ColorGreenLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) ColorGreenDarkColor else ColorGreenLightColor
 
 val ColorScheme.gray: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) ColorGrayDarkColor else ColorGrayLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) ColorGrayDarkColor else ColorGrayLightColor
 
 val ColorScheme.grayLight: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) ColorGrayLightDarkColor else ColorGrayLightLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) ColorGrayLightDarkColor else ColorGrayLightLightColor
 
 val ColorScheme.white: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) ColorWhiteDarkColor else ColorWhiteLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) ColorWhiteDarkColor else ColorWhiteLightColor
 
 val ColorScheme.overlay: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) SupportOverlayDarkColor else SupportOverlayLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) SupportOverlayDarkColor else SupportOverlayLightColor
 
 val ColorScheme.disable: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) LabelDisableDarkColor else LabelDisableLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) LabelDisableDarkColor else LabelDisableLightColor
 
 val ColorScheme.label: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) LabelPrimaryDarkColor else LabelPrimaryLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) LabelPrimaryDarkColor else LabelPrimaryLightColor
 
 val ColorScheme.tertiry: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) LabelTertiaryDarkColor else LabelTertiaryLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) LabelTertiaryDarkColor else LabelTertiaryLightColor
 
 val ColorScheme.lightRed: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) LightRedDarkColor else LightRedLigthColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) LightRedDarkColor else LightRedLigthColor
 
 val ColorScheme.blueTray: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) DarkBlueTrayColor else LightBlueTrayColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) DarkBlueTrayColor else LightBlueTrayColor
 
 val ColorScheme.backSecond: Color
     @Composable
-    get() = if (isSystemInDarkTheme()) BackSecondaryDarkColor else BackSecondaryLightColor
+    get() = if (TodoSettingsThemeProvider.current.darkTheme) BackSecondaryDarkColor else BackSecondaryLightColor
 
 
 
@@ -117,6 +117,9 @@ fun ToDoTheme(
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
+
+    TodoSettingsThemeProvider.current = ToDoThemeColors(darkTheme)
+
 
     MaterialTheme(
         colorScheme = colorScheme,

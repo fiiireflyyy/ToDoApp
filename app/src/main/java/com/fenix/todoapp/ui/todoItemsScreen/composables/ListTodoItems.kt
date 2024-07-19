@@ -55,6 +55,7 @@ fun ListTodoItems(
     changeShowDone: (Boolean) -> Unit,
     onDelete: (String) -> Unit,
     navigateToAddTodo: (String?) -> Unit,
+    navigateToSettings: () -> Unit,
 ) {
 
     Scaffold(
@@ -132,6 +133,17 @@ fun ListTodoItems(
                             }
 
                         }
+                        IconButton(
+                            onClick = { navigateToSettings() },
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(24.dp),
+                                painter = painterResource(id = R.drawable.baseline_settings_24),
+                                tint = MaterialTheme.colorScheme.blue,
+                                contentDescription = ""
+                            )
+                        }
                     }
                 }
             }
@@ -179,9 +191,9 @@ fun ListTodoItems(
                         ) {
                             TextButton(
                                 onClick = { navigateToAddTodo(null) },
-                                colors = ButtonDefaults.buttonColors (
+                                colors = ButtonDefaults.buttonColors(
                                     contentColor = MaterialTheme.colorScheme.tertiry,
-                                    containerColor = MaterialTheme.colorScheme.white,
+                                    containerColor = MaterialTheme.colorScheme.backSecond,
                                 ),
                             ) {
                                 Text(

@@ -43,6 +43,7 @@ fun TodoItemsScreen(viewModel: TodoItemsScreenViewModel) {
             changeShowDone = viewModel::changeShowDone,
             onDelete = viewModel::deleteTodo,
             navigateToAddTodo = viewModel::navigateToAddTodo,
+            navigateToSettings = viewModel::navigateToSettings,
         )
         is TodoItemsScreenState.Error -> {}
     }

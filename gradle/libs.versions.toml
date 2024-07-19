@@ -5,6 +5,7 @@ core = "0.9.0"
 dagger = "2.51.1"
 desugar_jdk_libs = "2.0.4"
 detektFormatting = "1.21.0"
+datastorePreferences = "1.1.1"
 divCore = "30.9.0"
 espressoCoreVersion = "3.5.1"
 glide = "30.9.0"
@@ -92,6 +93,8 @@ ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

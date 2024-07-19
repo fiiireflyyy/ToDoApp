@@ -27,7 +27,7 @@ class AboutAppFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         component = (activity as MainActivity)
             .mainActivityComponent
             .aboutAppFragmentComponent()

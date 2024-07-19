@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import com.fenix.todoapp.di.todoItemsScreen.TodoItemsScreenComponent
-import com.fenix.todoapp.navigation.Screen
 import com.fenix.todoapp.ui.MainActivity
 import com.fenix.todoapp.ui.design.theme.ToDoTheme
+import com.fenix.todoapp.ui.design.theme.ToDoThemeWithUserChoice
 import com.fenix.todoapp.ui.todoItemsScreen.composables.TodoItemsScreen
 import javax.inject.Inject
 
@@ -35,12 +36,11 @@ class TodoItemsFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                ToDoTheme {
+                val userThemeChoice = viewModel.userThemeChoice.collectAsState().value
+                ToDoThemeWithUserChoice(userThemeChoice = userThemeChoice) {
                     TodoItemsScreen(viewModel = viewModel)
                 }
             }
         }
     }
-
-
 }
