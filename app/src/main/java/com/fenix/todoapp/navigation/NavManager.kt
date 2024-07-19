@@ -1,10 +1,12 @@
 package com.fenix.todoapp.navigation
 
 import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 import com.fenix.todoapp.R
 import com.fenix.todoapp.di.activity.MainActivityScope
 import com.fenix.todoapp.ui.MainActivity
 import com.fenix.todoapp.ui.addTodoScreen.AddTodoFragment
+import com.fenix.todoapp.ui.todoItemsScreen.TodoItemsFragment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
@@ -30,5 +32,11 @@ class NavManager @Inject constructor(
 
     fun navigateBack(){
         fragmentManager?.popBackStack()
+    }
+
+    fun navigateToMainScreen() {
+        fragmentManager?.commit {
+            replace(R.id.fragment_container, TodoItemsFragment())
+        }
     }
 }

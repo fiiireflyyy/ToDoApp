@@ -44,7 +44,7 @@ fun ImportanceDropdown(importance: Importance, onImportanceChange: (Importance) 
                         modifier = Modifier.padding(end = 4.dp)
                     )
                 }
-                if(importance == Importance.Low){
+                if (importance == Importance.Low) {
                     Icon(
                         painter = painterResource(id = R.drawable.low_importance),
                         contentDescription = "Low Priority",
@@ -92,7 +92,8 @@ fun ImportanceDropdown(importance: Importance, onImportanceChange: (Importance) 
             )
             DropdownMenuItem(
                 text = {
-                    Text(text = "обычная",
+                    Text(
+                        text = "обычная",
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         color = MaterialTheme.colorScheme.label,

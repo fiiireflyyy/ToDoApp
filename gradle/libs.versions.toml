@@ -5,7 +5,9 @@ core = "0.9.0"
 dagger = "2.51.1"
 desugar_jdk_libs = "2.0.4"
 detektFormatting = "1.21.0"
+divCore = "30.9.0"
 espressoCoreVersion = "3.5.1"
+glide = "30.9.0"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -23,8 +25,10 @@ lifecycleRuntimeKtx = "2.8.2"
 activityCompose = "1.9.0"
 composeBom = "2024.06.00"
 lifecycleViewmodelCompose = "2.8.2"
+material = "1.6.8"
 navigationCompose = "2.7.7"
 fragmentKtx = "1.8.1"
+picasso = "30.9.0"
 workRuntimeKtx = "2.9.0"
 coroutines = "1.8.1"
 ktor = "2.3.7"
@@ -33,6 +37,12 @@ roomRuntime = "2.6.1"
 
 [libraries]
 agp = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material" }
+div = { module = "com.yandex.div:div", version.ref = "divCore" }
+div-core = { module = "com.yandex.div:div-core", version.ref = "divCore" }
+div-json = { module = "com.yandex.div:div-json", version.ref = "divCore" }
+glide = { module = "com.yandex.div:glide", version.ref = "glide" }
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 ktor-client = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
@@ -75,6 +85,7 @@ ktor-client-logging-jvm = { module = "io.ktor:ktor-client-logging-jvm", version.
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
 material3 = { module = "androidx.compose.material3:material3" }
+picasso = { module = "com.yandex.div:picasso", version.ref = "picasso" }
 ui = { module = "androidx.compose.ui:ui" }
 ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }

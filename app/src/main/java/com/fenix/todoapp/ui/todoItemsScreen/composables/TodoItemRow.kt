@@ -108,13 +108,7 @@ fun TodoItemRow(
                 Text(
                     modifier = Modifier.clickable { onClick(item.id) },
                     color = MaterialTheme.colorScheme.label,
-                    style = TextStyle(
-                        textDecoration = if (item.isDone){
-                            TextDecoration.LineThrough
-                        } else {
-                            TextDecoration.None
-                        }
-                    ),
+                    style = if (item.isDone) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodyMedium,
                     text = item.description,
                     fontSize = 16.sp,
                     lineHeight = 20.sp,
@@ -124,8 +118,8 @@ fun TodoItemRow(
                 if (item.deadline != null){
                     Text(
                         text = item.deadline,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         lineHeight = 20.sp,
                         maxLines = 1,
                         color = MaterialTheme.colorScheme.tertiry

@@ -130,9 +130,7 @@ fun DetailsTopAppBar(viewModel: AddTodoScreenViewModel, scrollState: ScrollState
                 ) {
                     Text(
                         text = "СОХРАНИТЬ",
-                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
-                        fontSize = 14.sp,
-                        lineHeight = 24.sp,
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             }
@@ -196,9 +194,8 @@ fun ImportanceRow(importance: Importance, setImportance: (Importance) -> Unit) {
     ) {
         Text(
             text = "Важность",
-            fontFamily = FontFamily(Font(R.font.roboto_regular)),
             color = MaterialTheme.colorScheme.label,
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.bodyMedium,
         )
         ImportanceDropdown(
             importance = importance,
@@ -229,9 +226,8 @@ fun DeadlineRow(
         ) {
             Text(
                 text = "Сделать до",
-                fontFamily = FontFamily(Font(R.font.roboto_regular)),
                 color = MaterialTheme.colorScheme.label,
-                fontSize = 16.sp,
+                style = MaterialTheme.typography.bodyMedium
             )
             if (deadline != null) {
                 Text(
@@ -239,8 +235,7 @@ fun DeadlineRow(
                         .padding(top = 4.dp)
                         .clickable { onShowDatePickerChange(true) },
                     text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(deadline),
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.blue,
                 )
             }
