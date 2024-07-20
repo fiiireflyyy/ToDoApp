@@ -128,13 +128,14 @@ fun TodoItemRow(
             }
         }
         IconButton(
+            onClick = { onClick(item.id) },
             modifier = Modifier
                 .padding(
                     end = 16.dp,
                     bottom = 12.dp,
                     start = 12.dp,
-                ),
-            onClick = { onClick(item.id) }) {
+                )
+            ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_info),
                 contentDescription = "",

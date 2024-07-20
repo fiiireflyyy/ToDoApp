@@ -1,5 +1,7 @@
 package com.fenix.todoapp.ui.addTodoScreen.composable
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -34,29 +37,31 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.fenix.todoapp.R
 import com.fenix.todoapp.domain.model.Importance
 import com.fenix.todoapp.ui.addTodoScreen.AddTodoScreenViewModel
 import com.fenix.todoapp.ui.design.theme.blue
 import com.fenix.todoapp.ui.design.theme.blueTray
 import com.fenix.todoapp.ui.design.theme.label
 import com.fenix.todoapp.ui.design.theme.overlay
+import com.fenix.todoapp.ui.design.theme.red
 import com.fenix.todoapp.ui.design.theme.white
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -196,17 +201,41 @@ fun DetailsContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImportanceRow(importance: Importance, setImportance: (Importance) -> Unit) {
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    var highlight by remember { mutableStateOf(false) }
+    val backgroundColor by animateColorAsState(
+        targetValue = if (highlight) MaterialTheme.colorScheme.red.copy(alpha = 0.5f) else Color.Transparent,
+        animationSpec = tween(durationMillis = 200)
+    )
+
+    LaunchedEffect(key1 = highlight) {
+        if (highlight) {
+            delay(200)
+            highlight = false
+        }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp, start = 16.dp, top = 16.dp),
+            .padding(bottom = 16.dp, start = 16.dp, top = 16.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(backgroundColor),
+
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "Важность",
+            modifier = Modifier.clickable {
+                showBottomSheet = true
+            },
             color = MaterialTheme.colorScheme.label,
             style = MaterialTheme.typography.bodyMedium,
         )
@@ -215,6 +244,76 @@ fun ImportanceRow(importance: Importance, setImportance: (Importance) -> Unit) {
             onImportanceChange = setImportance
         )
     }
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = {
+                showBottomSheet = false
+            },
+            modifier = Modifier
+                .padding(
+                    bottom = 16.dp,
+                    start = 16.dp,
+                    end = 16.dp
+                )
+                .fillMaxSize()
+        ) {
+            TextButton(
+                onClick = {
+                    setImportance(Importance.Low)
+                    showBottomSheet = false
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        vertical = 12.dp
+                    )
+            ) {
+                Text(
+                    text = "низкая",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.label
+                )
+            }
+            TextButton(
+                onClick = {
+                    setImportance(Importance.Medium)
+                    showBottomSheet = false
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        vertical = 12.dp
+                    )
+            ) {
+                Text(
+                    text = "обычная",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.blue
+                )
+            }
+            TextButton(
+                onClick = {
+                    setImportance(Importance.High)
+                    showBottomSheet = false
+                    highlight = true
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        vertical = 12.dp
+                    )
+            ) {
+                Text(
+                    text = "высокая",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.red
+                )
+            }
+        }
+    }
+
+
 }
 
 @Composable
