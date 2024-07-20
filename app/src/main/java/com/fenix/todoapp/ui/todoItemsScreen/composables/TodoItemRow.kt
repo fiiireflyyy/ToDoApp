@@ -18,10 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,8 +32,6 @@ import com.fenix.todoapp.ui.design.theme.red
 import com.fenix.todoapp.ui.design.theme.tertiry
 import com.fenix.todoapp.ui.design.theme.white
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemModelUi
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun TodoItemRow(
@@ -135,7 +129,7 @@ fun TodoItemRow(
                     bottom = 12.dp,
                     start = 12.dp,
                 )
-            ) {
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_info),
                 contentDescription = "",
