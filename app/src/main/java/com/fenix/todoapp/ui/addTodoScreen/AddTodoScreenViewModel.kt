@@ -1,17 +1,14 @@
 package com.fenix.todoapp.ui.addTodoScreen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import com.fenix.todoapp.data.Result
+import com.fenix.todoapp.data.preferences.PreferencesManager
 import com.fenix.todoapp.data.repository.TodoItemsRepository
 import com.fenix.todoapp.di.addTodoScreen.AddTodoScope
-import com.fenix.todoapp.domain.mapper.TodoToPostMapper
 import com.fenix.todoapp.domain.model.Importance
+import com.fenix.todoapp.domain.model.SettingsTheme
 import com.fenix.todoapp.domain.model.TodoItem
 import com.fenix.todoapp.navigation.NavManager
-import com.fenix.todoapp.navigation.Screen
 import com.fenix.todoapp.ui.addTodoScreen.state.AddTodoScreenState
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenUiEffects
 import kotlinx.coroutines.Dispatchers
@@ -19,11 +16,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.Calendar
-import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -33,7 +28,8 @@ import javax.inject.Inject
 class AddTodoScreenViewModel @Inject constructor(
     private val repository: TodoItemsRepository,
     private val navManager: NavManager,
-) : ViewModel() {
+    private val preferencesManager: PreferencesManager,
+    ) : ViewModel() {
 
     private val _importance = MutableStateFlow<Importance>(Importance.Medium)
     val importance = _importance.asStateFlow()
@@ -56,8 +52,13 @@ class AddTodoScreenViewModel @Inject constructor(
 
     private var todoItem: TodoItem? = null
 
+    private val _userThemeChoice =
+        MutableStateFlow<SettingsTheme>(SettingsTheme.SystemThemeChoice)
+    val userThemeChoice = _userThemeChoice.asStateFlow()
+
     init {
         getChangeItem()
+        collectUserThemeChoice()
     }
 
     private fun getChangeItem() {
@@ -159,6 +160,14 @@ class AddTodoScreenViewModel @Inject constructor(
 
     fun navigateBack() {
         navManager.navigateBack()
+    }
+
+    private fun collectUserThemeChoice() {
+        viewModelScope.launch(Dispatchers.Default) {
+            preferencesManager.selectedUserThemeChoice.collect {
+                _userThemeChoice.value = it
+            }
+        }
     }
 
 }

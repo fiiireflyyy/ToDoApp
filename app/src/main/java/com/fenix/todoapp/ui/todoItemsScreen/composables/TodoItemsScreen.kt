@@ -3,6 +3,10 @@
 package com.fenix.todoapp.ui.todoItemsScreen.composables
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +15,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -43,6 +51,7 @@ fun TodoItemsScreen(viewModel: TodoItemsScreenViewModel) {
             changeShowDone = viewModel::changeShowDone,
             onDelete = viewModel::deleteTodo,
             navigateToAddTodo = viewModel::navigateToAddTodo,
+            navigateToSettings = viewModel::navigateToSettings,
         )
         is TodoItemsScreenState.Error -> {}
     }

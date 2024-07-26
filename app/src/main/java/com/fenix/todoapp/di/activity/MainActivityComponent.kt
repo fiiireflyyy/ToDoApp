@@ -1,6 +1,8 @@
 package com.fenix.todoapp.di.activity
 
+import com.fenix.todoapp.di.aboutAppScreen.AboutAppScreenComponent
 import com.fenix.todoapp.di.addTodoScreen.AddTodoScreenComponent
+import com.fenix.todoapp.di.settingsThemeScreen.SettingsThemeScreenComponent
 import com.fenix.todoapp.di.todoItemsScreen.TodoItemsScreenComponent
 import com.fenix.todoapp.ui.MainActivity
 import dagger.Subcomponent
@@ -12,4 +14,6 @@ interface MainActivityComponent {
     fun inject(activity: MainActivity)
     fun todoItemsFragmentComponent(): TodoItemsScreenComponent
     fun todoItemsAddFragmentComponent(): AddTodoScreenComponent
+    fun aboutAppFragmentComponent(): AboutAppScreenComponent
+    fun settingsThemeFragmentComponent(): SettingsThemeScreenComponent
 }

@@ -2,6 +2,7 @@ package com.fenix.todoapp.ui.todoItemsScreen.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FloatingActionButton
@@ -24,7 +27,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -50,6 +55,7 @@ fun ListTodoItems(
     changeShowDone: (Boolean) -> Unit,
     onDelete: (String) -> Unit,
     navigateToAddTodo: (String?) -> Unit,
+    navigateToSettings: () -> Unit,
 ) {
 
     Scaffold(
@@ -92,10 +98,8 @@ fun ListTodoItems(
                 ) {
                     Text(
                         text = "Мои дела",
-                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                        style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.label,
-                        fontSize = 32.sp,
-                        lineHeight = 37.5.sp
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -105,9 +109,7 @@ fun ListTodoItems(
                         Text(
                             text = "Выполнено — $completedCount",
                             color = MaterialTheme.colorScheme.tertiry,
-                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                            fontSize = 16.sp,
-                            lineHeight = 20.sp
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                         IconButton(
                             onClick = { changeShowDone(!isShowDone) },
@@ -130,6 +132,17 @@ fun ListTodoItems(
                                 )
                             }
 
+                        }
+                        IconButton(
+                            onClick = { navigateToSettings() },
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(24.dp),
+                                painter = painterResource(id = R.drawable.baseline_settings_24),
+                                tint = MaterialTheme.colorScheme.blue,
+                                contentDescription = ""
+                            )
                         }
                     }
                 }
@@ -176,16 +189,19 @@ fun ListTodoItems(
                                 .background(MaterialTheme.colorScheme.backSecond)
                                 .padding(start = 52.dp, bottom = 20.dp),
                         ) {
-                            Text(
-                                modifier = Modifier
-                                    .clickable { navigateToAddTodo(null) },
-                                text = "Новое",
-                                fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                                fontSize = 16.sp,
-                                lineHeight = 20.sp,
-                                maxLines = 1,
-                                color = MaterialTheme.colorScheme.tertiry,
-                            )
+                            TextButton(
+                                onClick = { navigateToAddTodo(null) },
+                                colors = ButtonDefaults.buttonColors(
+                                    contentColor = MaterialTheme.colorScheme.tertiry,
+                                    containerColor = MaterialTheme.colorScheme.backSecond,
+                                ),
+                            ) {
+                                Text(
+                                    text = "Новое",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    maxLines = 1,
+                                )
+                            }
                         }
                     }
                 }

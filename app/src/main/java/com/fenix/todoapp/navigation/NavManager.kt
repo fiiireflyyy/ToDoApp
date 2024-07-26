@@ -5,10 +5,13 @@ import com.fenix.todoapp.R
 import com.fenix.todoapp.di.activity.MainActivityScope
 import com.fenix.todoapp.ui.MainActivity
 import com.fenix.todoapp.ui.addTodoScreen.AddTodoFragment
+import com.fenix.todoapp.ui.settingsThemeScreen.SettingsThemeFragment
+import com.fenix.todoapp.ui.todoItemsScreen.TodoItemsFragment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Provider
+
 @MainActivityScope
 class NavManager @Inject constructor(
     private val activity: Provider<MainActivity>,
@@ -23,6 +26,12 @@ class NavManager @Inject constructor(
     fun navigateToAddFragment(id: String?) {
         _todoItemId.value = id
         fragmentManager?.commit {
+            setCustomAnimations(
+                R.anim.slide_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.slide_out
+            )
             replace(R.id.fragment_container, AddTodoFragment())
             addToBackStack(null)
         }
@@ -31,4 +40,30 @@ class NavManager @Inject constructor(
     fun navigateBack(){
         fragmentManager?.popBackStack()
     }
+
+    fun navigateToMainScreen() {
+        fragmentManager?.commit {
+            setCustomAnimations(
+                R.anim.slide_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.slide_out
+            )
+            replace(R.id.fragment_container, TodoItemsFragment())
+        }
+    }
+
+    fun navigateToSettingsThemeScreen() {
+        fragmentManager?.commit {
+            setCustomAnimations(
+                R.anim.slide_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.slide_out
+            )
+            replace(R.id.fragment_container, SettingsThemeFragment())
+            addToBackStack(null)
+        }
+    }
+
 }

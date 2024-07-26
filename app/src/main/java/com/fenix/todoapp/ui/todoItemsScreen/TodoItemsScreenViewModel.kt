@@ -1,17 +1,14 @@
 package com.fenix.todoapp.ui.todoItemsScreen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import com.fenix.todoapp.data.Result
+import com.fenix.todoapp.data.preferences.PreferencesManager
 import com.fenix.todoapp.data.repository.TodoItemsRepository
 import com.fenix.todoapp.di.todoItemsScreen.TodoItemsScope
+import com.fenix.todoapp.domain.model.SettingsTheme
 import com.fenix.todoapp.domain.model.TodoItem
 import com.fenix.todoapp.navigation.NavManager
-import com.fenix.todoapp.navigation.Screen
-import com.fenix.todoapp.ui.addTodoScreen.AddTodoScreenViewModel
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemModelUi
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenState
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenUiEffects
@@ -26,7 +23,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
-import javax.inject.Singleton
+
 /**
  * [TodoItemsScreenViewModel] is responsible for managing the UI-related data for the Todo screen.
  */
@@ -35,6 +32,7 @@ import javax.inject.Singleton
 class TodoItemsScreenViewModel @Inject constructor(
     private val repository: TodoItemsRepository,
     private val navManager: NavManager,
+    private val preferencesManager: PreferencesManager,
 ) : ViewModel(){
 
     private var todoItems = listOf<TodoItemModelUi>()
@@ -48,7 +46,12 @@ class TodoItemsScreenViewModel @Inject constructor(
     init {
         getListFromBase()
         loadTodoItems()
+        collectUserThemeChoice()
     }
+
+    private val _userThemeChoice =
+        MutableStateFlow<SettingsTheme>(SettingsTheme.SystemThemeChoice)
+    val userThemeChoice = _userThemeChoice.asStateFlow()
 
     private fun loadTodoItems() {
         viewModelScope.launch {
@@ -69,6 +72,14 @@ class TodoItemsScreenViewModel @Inject constructor(
                     isShowDone = isShowDone,
                 )
 
+            }
+        }
+    }
+
+    private fun collectUserThemeChoice() {
+        viewModelScope.launch(Dispatchers.Default) {
+            preferencesManager.selectedUserThemeChoice.collect {
+                _userThemeChoice.value = it
             }
         }
     }
@@ -122,6 +133,10 @@ class TodoItemsScreenViewModel @Inject constructor(
         }
     }
 
+    fun navigateToSettings() {
+        navManager.navigateToSettingsThemeScreen()
+    }
+
     private fun TodoItem.toTodoItemsUiModel(): TodoItemModelUi {
         return TodoItemModelUi(
             id = id,
@@ -140,10 +155,6 @@ class TodoItemsScreenViewModel @Inject constructor(
 
         fun toFormattedDate(dateLong: Long?): String? =
             dateLong?.let { formatter.format(Date(it)) }
-
-        fun toDateLong(dateString: String?): Long? =
-            dateString?.let { formatter.parse(it)?.time ?: 0L }
-
     }
 
 }

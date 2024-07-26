@@ -30,7 +30,7 @@ fun DeleteRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 16.dp),
+            .padding(top = 0.dp),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -54,17 +54,15 @@ fun DeleteRow(
         if (canDelete){
             Text(
                 text = "Удалить",
-                fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.red,
-                fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
         else{
             Text(
                 text = "Удалить",
-                fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.tertiry,
-                fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
 

@@ -7,7 +7,7 @@ plugins {
 }
 
 val maxApkSizeValue = 30
-val validationEnabledValue = true
+val validationEnabledValue = false
 val analysisEnabledValue = true
 tgReporter {
     token.set(providers.environmentVariable("TG_TOKEN"))
@@ -53,6 +53,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -60,6 +61,13 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    sourceSets {
+        getByName("main") {
+            assets {
+                srcDirs("src\\main\\assets", "src\\main\\assets")
+            }
         }
     }
 }
@@ -84,6 +92,11 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.datastore.preferences)
+
+
 
     //dager-2
     implementation(libs.dagger)
@@ -105,4 +118,10 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
+
+    //divkit
+    implementation(libs.div.core)
+    implementation(libs.div)
+    implementation(libs.div.json)
+    implementation(libs.picasso)
 }

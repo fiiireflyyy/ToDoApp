@@ -6,6 +6,8 @@ import androidx.room.Room
 import com.fenix.todoapp.data.dp.TodoDao
 import com.fenix.todoapp.data.dp.TodoDatabase
 import com.fenix.todoapp.data.network.NetworkConnection
+import com.fenix.todoapp.data.preferences.PreferencesManager
+import com.fenix.todoapp.data.preferences.dataStore
 import com.fenix.todoapp.di.app.AppScope
 import dagger.Module
 import dagger.Provides
@@ -91,5 +93,9 @@ object NetworkModule {
     fun provideNetworkConnection(context: Context): NetworkConnection {
         return NetworkConnection(context)
     }
-
+    @Provides
+    @AppScope
+    fun providePreferencesManager(context: Context): PreferencesManager {
+        return PreferencesManager(context.dataStore)
+    }
 }

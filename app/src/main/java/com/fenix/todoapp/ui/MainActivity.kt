@@ -8,12 +8,15 @@ import com.fenix.todoapp.app.App
 import com.fenix.todoapp.data.network.WorkScheduler
 import com.fenix.todoapp.di.activity.MainActivityComponent
 import com.fenix.todoapp.di.activity.MainActivityModule
-import com.fenix.todoapp.ui.todoItemsScreen.TodoItemsFragment
+import com.fenix.todoapp.ui.aboutAppScreen.AboutAppFragment
+import com.fenix.todoapp.ui.aboutAppScreen.AssetsReader
 
 class MainActivity : FragmentActivity() {
 
     lateinit var mainActivityComponent: MainActivityComponent
         private set
+
+    val assetReader = AssetsReader(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mainActivityComponent = (applicationContext as App).appComponent.mainActivityComponent(
@@ -27,7 +30,7 @@ class MainActivity : FragmentActivity() {
 
         if(savedInstanceState == null) {
             supportFragmentManager.commit {
-                replace(R.id.fragment_container, TodoItemsFragment())
+                replace(R.id.fragment_container, AboutAppFragment())
             }
         }
     }

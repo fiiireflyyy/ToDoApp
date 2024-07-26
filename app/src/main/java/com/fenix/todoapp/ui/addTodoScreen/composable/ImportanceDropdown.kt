@@ -44,7 +44,7 @@ fun ImportanceDropdown(importance: Importance, onImportanceChange: (Importance) 
                         modifier = Modifier.padding(end = 4.dp)
                     )
                 }
-                if(importance == Importance.Low){
+                if (importance == Importance.Low) {
                     Icon(
                         painter = painterResource(id = R.drawable.low_importance),
                         contentDescription = "Low Priority",
@@ -59,8 +59,7 @@ fun ImportanceDropdown(importance: Importance, onImportanceChange: (Importance) 
                         Importance.High -> "срочная"
                     },
                     color = if (importance == Importance.High) MaterialTheme.colorScheme.red else MaterialTheme.colorScheme.blue, // Устанавливаем красный цвет только для срочной важности
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto_medium))
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }
@@ -79,8 +78,7 @@ fun ImportanceDropdown(importance: Importance, onImportanceChange: (Importance) 
                         )
                         Text(
                             text = "низкая",
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                            style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.label,
                         )
                     }
@@ -92,9 +90,9 @@ fun ImportanceDropdown(importance: Importance, onImportanceChange: (Importance) 
             )
             DropdownMenuItem(
                 text = {
-                    Text(text = "обычная",
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                    Text(
+                        text = "обычная",
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.label,
                     )
                 },

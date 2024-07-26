@@ -56,10 +56,8 @@ fun CustomCard(
             placeholder = {
                 Text(
                     text = "Что надо сделать...",
-                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.tertiry,
-                    fontSize = 16.sp,
-                    lineHeight = 18.sp,
                 )
             },
             minLines = 3,

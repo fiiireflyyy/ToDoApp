@@ -1,0 +1,372 @@
+{
+  "templates": {
+    "second_screen": {
+      "type": "container",
+      "margins": {
+        "left": 12,
+        "right": 12,
+        "top": 12,
+        "bottom": 12
+      },
+      "items": [
+        {
+          "type": "text",
+          "$text": "title_text",
+          "font_size": 20
+        },
+        {
+          "type": "text",
+          "margins": {
+            "top": 20
+          },
+          "$text": "description_text",
+          "font_size": 16,
+          "actions": [
+            {
+              "log_id": "log_id=switch_to_state_0",
+              "url": "div-action://set_state?state_id=0"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "text": "Закрыть экран информации",
+          "text_alignment_horizontal": "center",
+          "underline": "single",
+          "font_size": 16,
+          "margins":{
+            "top": 20
+          },
+          "actions":[
+            {
+              "log_id": "navigate_back",
+              "url": "navigate-action://navigate_to_main"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "margins": {
+            "top": 20
+          },
+          "font_size": 20,
+          "text_alignment_vertical": "bottom",
+          "text_alignment_horizontal": "center",
+          "$text": "num_pager"
+        }
+      ]
+    }
+  },
+  "card": {
+    "variables": [
+      {
+        "name": "fire.count",
+        "type": "integer",
+        "value": 1
+      }
+    ],
+    "log_id": "about_app",
+    "states": [
+      {
+        "state_id": 0,
+        "div": {
+          "type": "container",
+          "background": [
+            {
+              "type": "solid",
+              "color": "#fff"
+            }
+          ],
+          "height":{
+            "type": "match_parent"
+          },
+          "margins": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "alignment_horizontal": "center",
+          "border": {
+            "corner_radius": 14,
+            "stroke": {
+              "color": "#666"
+            },
+            "shadow": {
+              "offset": {
+                "x": {
+                  "value": 1
+                },
+                "y": {
+                  "value": 4
+                }
+              },
+              "color": "#000"
+            },
+            "has_shadow": true
+          },
+          "visibility_actions": [
+            {
+              "log_id": "fire.counter",
+              "url": "div-action://timer?id=fire_timer&action=start"
+            }
+          ],
+          "items": [
+            {
+              "type": "image",
+              "image_url": "https://cdn-st2.rtr-vesti.ru/vh/pictures/hd/160/365/7.jpg",
+              "aspect": {
+                "ratio": 1
+              },
+              "actions": [
+                {
+                  "log_id": "switch_to_state_1",
+                  "url": "div-action://set_state?state_id=1"
+                }
+              ]
+            },
+            {
+              "type": "container",
+              "orientation": "horizontal",
+              "margins": {
+                "left": 12,
+                "right": 12,
+                "top": 12,
+                "bottom": 12
+              },
+              "items": [
+                {
+                  "type": "text",
+                  "text": "Yandex Todo App by @fIreFenI",
+                  "font_size": 16,
+                  "ranges": [
+                    {
+                      "start": 0,
+                      "end": 20,
+                      "font_size": 12
+                    }
+                  ]
+                },
+                {
+                  "type": "container",
+                  "orientation": "horizontal",
+                  "width": {
+                    "type": "wrap_content"
+                  },
+                  "content_alignment_vertical": "center",
+                  "items": [
+                    {
+                      "type": "text",
+                      "text": "@{fire.count}",
+                      "font_size": 20,
+                      "width": {
+                        "type": "wrap_content"
+                      },
+                      "paddings": {
+                        "right": 7
+                      }
+                    },
+                    {
+                      "type": "state",
+                      "id": "fire.count",
+                      "width":{
+                        "type": "wrap_content"
+                      },
+                      "default_state_id": "fire",
+                      "states": [
+                        {
+                          "state_id": "unfire",
+                          "div": {
+                            "type": "image",
+                            "image_url": "https://www.clipartbest.com/cliparts/eTM/yEG/eTMyEGEXc.jpg",
+                            "width":{
+                              "type": "fixed",
+                              "value": 24,
+                              "unit": "dp"
+                            },
+                            "actions": [
+                              {
+                                "log_id": "fire.unfire",
+                                "url": "div-action://set_variable?name=fire.count&value=@{fire.count + 1}"
+                              },
+                              {
+                                "log_id": "set_fire",
+                                "url": "div-action://set_state?state_id=0/fire.count/fire"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "state_id": "fire",
+                          "div": {
+                            "type": "image",
+                            "image_url": "https://www.clipartbest.com/cliparts/eTM/yEG/eTMyEGEXc.jpg",
+                            "tint_color": "#ff5722",
+                            "tint_mode": "lighten",
+                            "width":{
+                              "type": "fixed",
+                              "value": 24,
+                              "unit": "dp"
+                            },
+                            "actions": [
+                              {
+                                "log_id": "fire.unfire",
+                                "url": "div-action://set_variable?name=fire.count&value=@{fire.count - 1}"
+                              },
+                              {
+                                "log_id": "set_fire",
+                                "url": "div-action://set_state?state_id=0/fire.count/unfire"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "container",
+              "margins": {
+                "left": 12,
+                "right": 12,
+                "top": 12,
+                "bottom": 12
+              },
+              "items": [
+                {
+                  "type": "text",
+                  "font_size": 16,
+                  "text": "Приветствую дорогой проверяюший! Это экран <o приложении>."
+                },
+                {
+                  "type": "state",
+                  "id": "show_more",
+                  "states": [
+                    {
+                      "state_id": "little_part",
+                      "div":{
+                        "type": "container",
+                        "margins": {
+                          "left": 12,
+                          "right": 12,
+                          "top": 12,
+                          "bottom": 12
+                        },
+                        "items": [
+                          {
+                            "type": "text",
+                            "font_size": 14,
+                            "margins": {
+                              "top": 12
+                            },
+                            "text": "Показать больше",
+                            "text_alignment_horizontal": "center",
+                            "underline": "single",
+                            "actions": [
+                              {
+                                "log_id": "switch_to_state_big_part",
+                                "url": "div-action://set_state?state_id=0/show_more/big_part"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "state_id": "big_part",
+                      "div":{
+                        "type": "container",
+                        "margins": {
+                          "left": 12,
+                          "right": 12,
+                          "top": 12,
+                          "bottom": 12
+                        },
+                        "items": [
+                          {
+                            "type": "text",
+                            "font_size": 14,
+                            "text": "К сожалению, у меня отсутствует дизайнерская мысля, поэтому это выглядит так, как выглядит. Тем не менее, вроде всё, что написано, использовал. Кстати, нажми на картинку)"
+                          },
+                          {
+                            "type": "text",
+                            "font_size": 14,
+                            "margins": {
+                              "top": 12
+                            },
+                            "text": "Скрыть",
+                            "text_alignment_horizontal": "center",
+                            "underline": "single",
+                            "actions": [
+                              {
+                                "log_id": "switch_to_state_little_part",
+                                "url": "div-action://set_state?state_id=0/show_more/little_part"
+                              }
+                            ]
+
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "state_id": 1,
+        "div": {
+          "type": "container",
+          "height":{
+            "type": "match_parent"
+          },
+          "margins": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "border": {
+            "stroke": {
+              "color": "#ff4500"
+            },
+            "corner_radius": 14
+          },
+          "items": [
+            {
+              "type": "pager",
+              "height": {
+                "type": "match_parent"
+              },
+              "layout_mode":{
+                "type": "percentage",
+                "page_width": {
+                  "type": "percentage",
+                  "value": 100
+                }
+              },
+              "items": [
+                {
+                  "type": "second_screen",
+                  "title_text": "Введение",
+                  "description_text": "Приложение todo, разработано в рамках обучения в ШМР - летней школе Яндекса. Приложение предоставляет весь необходимый пользователю функционал для управления делами как онлайн (предоставляемый backend), так и оффлайн (локальная бд). Это создание, редактирование, удаление, пометка сделанным, а также возможность установки дедлайна, степени важности и жестовое управление",
+                  "num_pager": "1/2"
+                },
+                {
+                  "type": "second_screen",
+                  "title_text": "Технологический стек",
+                  "description_text": "1. Compose\n2. DI - Dagger2\n3. Работа с сетью - Ktor\n4. Локальная БД - Room\n Приложение написано со старанием соблюсти clean architecture, и получилось нечто вроде mvvm/mvi",
+                  "num_pager": "2/2"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
