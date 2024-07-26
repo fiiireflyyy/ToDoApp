@@ -28,8 +28,8 @@ fun SwipeToDeleteContainer(
     onCheckedChange: (String, Boolean) -> Unit,
     animationDuration: Int = 500,
     content: @Composable () -> Unit,
-){
-    var isRemoved by remember{
+) {
+    var isRemoved by remember {
         mutableStateOf(false)
     }
 
@@ -40,10 +40,12 @@ fun SwipeToDeleteContainer(
                     isRemoved = true
                     true
                 }
+
                 SwipeToDismissBoxValue.StartToEnd -> {
                     onCheckedChange(item.id, true)
                     false
                 }
+
                 SwipeToDismissBoxValue.Settled -> false
             }
         }

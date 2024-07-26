@@ -18,6 +18,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,26 +50,35 @@ fun TodoItemRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.backSecond)
-    ){
+            .semantics(mergeDescendants = true) {
+                liveRegion = LiveRegionMode.Polite
+                contentDescription = item.description
+                stateDescription = if (item.isDone) {
+                    "Выполнено"
+                } else {
+                    "Не выполнено"
+                }
+            }
+    ) {
         Checkbox(
             modifier = Modifier
                 .padding(start = 4.dp)
                 .clip(RoundedCornerShape(2.dp)),
             checked = item.isDone,
-            onCheckedChange = {onCheckedChange(item.id, it)},
+            onCheckedChange = { onCheckedChange(item.id, it) },
             colors = CheckboxColors(
                 checkedCheckmarkColor = MaterialTheme.colorScheme.backSecond,
                 checkedBoxColor = MaterialTheme.colorScheme.green,
                 checkedBorderColor = MaterialTheme.colorScheme.green,
                 uncheckedCheckmarkColor = MaterialTheme.colorScheme.white,
-                uncheckedBorderColor = if (item.importance is Importance.High){
+                uncheckedBorderColor = if (item.importance is Importance.High) {
                     MaterialTheme.colorScheme.red
                 } else {
                     MaterialTheme.colorScheme.outline
                 },
-                uncheckedBoxColor = if (item.importance is Importance.High){
+                uncheckedBoxColor = if (item.importance is Importance.High) {
                     MaterialTheme.colorScheme.lightRed
-                } else{
+                } else {
                     MaterialTheme.colorScheme.backSecond
                 },
                 disabledBorderColor = MaterialTheme.colorScheme.white,
@@ -77,27 +93,29 @@ fun TodoItemRow(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .padding(vertical = 12.dp),
-        ){
-            if(item.importance is Importance.High){
+                .padding(vertical = 12.dp)
+                .clearAndSetSemantics { },
+        ) {
+            if (item.importance is Importance.High) {
                 Icon(
                     modifier = Modifier.padding(top = 2.dp, end = 4.dp),
                     painter = painterResource(id = R.drawable.hight_importance),
-                    contentDescription = "",
+                    contentDescription = stringResource(id = R.string.urgent_icon_description),
                     tint = MaterialTheme.colorScheme.red,
                 )
             }
-            if (item.importance is Importance.Low){
+            if (item.importance is Importance.Low) {
                 Icon(
                     modifier = Modifier.padding(top = 2.dp),
                     painter = painterResource(id = R.drawable.low_importance),
-                    contentDescription = "",
+                    contentDescription = stringResource(id = R.string.low_icon_description),
                     tint = MaterialTheme.colorScheme.gray
                 )
             }
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
+                    .clearAndSetSemantics { }
             ) {
                 Text(
                     modifier = Modifier.clickable { onClick(item.id) },
@@ -109,7 +127,7 @@ fun TodoItemRow(
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                 )
-                if (item.deadline != null){
+                if (item.deadline != null) {
                     Text(
                         text = item.deadline,
                         style = MaterialTheme.typography.headlineMedium,
@@ -132,7 +150,7 @@ fun TodoItemRow(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_info),
-                contentDescription = "",
+                contentDescription = stringResource(id = R.string.info_item_icon_description),
                 tint = MaterialTheme.colorScheme.tertiry,
             )
         }

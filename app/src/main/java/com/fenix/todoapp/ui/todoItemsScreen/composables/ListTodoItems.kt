@@ -1,8 +1,6 @@
 package com.fenix.todoapp.ui.todoItemsScreen.composables
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -29,14 +26,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.fenix.todoapp.R
 import com.fenix.todoapp.ui.design.theme.backSecond
 import com.fenix.todoapp.ui.design.theme.blue
@@ -71,7 +65,7 @@ fun ListTodoItems(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "Add",
+                    contentDescription = stringResource(id = R.string.fab_description),
                 )
             }
         },
@@ -120,7 +114,7 @@ fun ListTodoItems(
                                         .size(24.dp),
                                     painter = painterResource(id = R.drawable.visibility_off),
                                     tint = MaterialTheme.colorScheme.blue,
-                                    contentDescription = ""
+                                    contentDescription = stringResource(id = R.string.eye_icon_description),
                                 )
                             } else {
                                 Icon(
@@ -128,7 +122,7 @@ fun ListTodoItems(
                                         .size(24.dp),
                                     painter = painterResource(id = R.drawable.show_hide),
                                     tint = MaterialTheme.colorScheme.blue,
-                                    contentDescription = ""
+                                    contentDescription = stringResource(id = R.string.eye_off_icon_description)
                                 )
                             }
 
@@ -141,7 +135,7 @@ fun ListTodoItems(
                                     .size(24.dp),
                                 painter = painterResource(id = R.drawable.baseline_settings_24),
                                 tint = MaterialTheme.colorScheme.blue,
-                                contentDescription = ""
+                                contentDescription = stringResource(id = R.string.settings_icon_description),
                             )
                         }
                     }

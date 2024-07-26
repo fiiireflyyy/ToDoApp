@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">ToDo App</string>
+    <string name="fab_description">Создать заметку</string>
+    <string name="settings_icon_description">Настройки</string>
+    <string name="info_icon_description">О приложении</string>
+    <string name="eye_icon_description">Включена видимость</string>
+    <string name="eye_off_icon_description">Выключена видимость</string>
+    <string name="urgent_icon_description">Высокая важность</string>
+    <string name="low_icon_description">Низкая важность</string>
+    <string name="info_item_icon_description">Информация о деле</string>
+    <string name="close">Закрыть</string>
+    <string name="my_todos">Мои дела</string>
+    <string name="garbage">Мусорная урна</string>
+    <string name="action_label">Изменить выполнение дела</string>
 </resources>
