@@ -13,10 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.fenix.todoapp.R
 import com.fenix.todoapp.ui.design.theme.red
 import com.fenix.todoapp.ui.design.theme.tertiry
@@ -37,28 +35,34 @@ fun DeleteRow(
 
         IconButton(
             onClick = {
-                if (canDelete){
+                if (canDelete) {
                     deleteTodo()
                     navigateBack()
                 }
             },
             enabled = canDelete
         ) {
-            if (canDelete){
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.red)
-            }
-            else{
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.tertiry)
+            if (canDelete) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = stringResource(id = R.string.garbage),
+                    tint = MaterialTheme.colorScheme.red
+                )
+            } else {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = stringResource(id = R.string.garbage),
+                    tint = MaterialTheme.colorScheme.tertiry
+                )
             }
         }
-        if (canDelete){
+        if (canDelete) {
             Text(
                 text = "Удалить",
                 color = MaterialTheme.colorScheme.red,
                 style = MaterialTheme.typography.bodyMedium,
             )
-        }
-        else{
+        } else {
             Text(
                 text = "Удалить",
                 color = MaterialTheme.colorScheme.tertiry,

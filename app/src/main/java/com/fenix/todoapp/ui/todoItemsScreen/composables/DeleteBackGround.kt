@@ -2,7 +2,6 @@
 
 package com.fenix.todoapp.ui.todoItemsScreen.composables
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,14 +31,15 @@ import com.fenix.todoapp.ui.design.theme.white
 fun DeleteBackGround(
     swipeDismissState: SwipeToDismissBoxState,
     isDone: Boolean,
-){
-    val color = when(swipeDismissState.dismissDirection){
+) {
+    val color = when (swipeDismissState.dismissDirection) {
         SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.red
-        SwipeToDismissBoxValue.StartToEnd -> if(!isDone){
+        SwipeToDismissBoxValue.StartToEnd -> if (!isDone) {
             MaterialTheme.colorScheme.green
-        } else{
+        } else {
             Color.Transparent
         }
+
         SwipeToDismissBoxValue.Settled -> Color.Transparent
     }
 
@@ -48,14 +48,14 @@ fun DeleteBackGround(
             .fillMaxSize()
             .background(color)
             .padding(16.dp),
-    ){
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-        ){
+        ) {
             Icon(
                 Icons.Default.Check,
                 modifier = Modifier

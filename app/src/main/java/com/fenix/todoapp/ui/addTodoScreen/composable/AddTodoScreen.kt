@@ -7,17 +7,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import com.fenix.todoapp.ui.addTodoScreen.AddTodoScreenViewModel
+import com.fenix.todoapp.ui.addTodoScreen.composable.DetailsTodo
 import com.fenix.todoapp.ui.addTodoScreen.state.AddTodoScreenState
 import com.fenix.todoapp.ui.design.theme.ProgressBar
-import com.fenix.todoapp.ui.addTodoScreen.composable.DetailsTodo
 import com.fenix.todoapp.ui.todoItemsScreen.state.TodoItemsScreenUiEffects
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun AddTodoScreen(
     viewModel: AddTodoScreenViewModel,
-    )
-{
+) {
     val todoUiState = viewModel.uiState.collectAsState().value
     ShowUiEffectsIfNeeded(uiEffectFlow = viewModel.uiEffectFlow)
 
@@ -38,6 +37,7 @@ private fun ShowUiEffectsIfNeeded(uiEffectFlow: Flow<TodoItemsScreenUiEffects>) 
                 is TodoItemsScreenUiEffects.SomethingWentWrongMessage -> {
                     Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                 }
+
                 is TodoItemsScreenUiEffects.CustomMessage -> {
                     Toast.makeText(context, uiEffect.message, Toast.LENGTH_SHORT).show()
                 }

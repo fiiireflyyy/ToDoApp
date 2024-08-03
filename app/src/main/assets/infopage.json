@@ -31,6 +31,9 @@
         {
           "type": "text",
           "text": "Закрыть экран информации",
+          "accessibility": {
+            "description": "Закрыть экран информации"
+          },
           "text_alignment_horizontal": "center",
           "underline": "single",
           "font_size": 16,
@@ -115,6 +118,9 @@
             {
               "type": "image",
               "image_url": "https://cdn-st2.rtr-vesti.ru/vh/pictures/hd/160/365/7.jpg",
+              "accessibility": {
+                "description": "Логотип яндекса"
+              },
               "aspect": {
                 "ratio": 1
               },
@@ -179,6 +185,9 @@
                           "div": {
                             "type": "image",
                             "image_url": "https://www.clipartbest.com/cliparts/eTM/yEG/eTMyEGEXc.jpg",
+                            "accessibility": {
+                              "description": "негорящий огонь, установить горящим"
+                            },
                             "width":{
                               "type": "fixed",
                               "value": 24,
@@ -202,6 +211,9 @@
                             "type": "image",
                             "image_url": "https://www.clipartbest.com/cliparts/eTM/yEG/eTMyEGEXc.jpg",
                             "tint_color": "#ff5722",
+                            "accessibility": {
+                              "description": "горящий огонь, установить негорящим"
+                            },
                             "tint_mode": "lighten",
                             "width":{
                               "type": "fixed",
@@ -297,6 +309,9 @@
                               "top": 12
                             },
                             "text": "Скрыть",
+                            "accessibility": {
+                              "description": "Скрыть"
+                            },
                             "text_alignment_horizontal": "center",
                             "underline": "single",
                             "actions": [

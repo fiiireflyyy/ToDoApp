@@ -47,11 +47,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fenix.todoapp.R
 import com.fenix.todoapp.domain.model.Importance
 import com.fenix.todoapp.ui.addTodoScreen.AddTodoScreenViewModel
 import com.fenix.todoapp.ui.design.theme.blue
@@ -124,7 +125,7 @@ fun DetailsTopAppBar(
             IconButton(onClick = { viewModel.navigateBack() }) {
                 Icon(
                     Icons.Default.Close,
-                    contentDescription = "",
+                    contentDescription = stringResource(id = R.string.close),
                     tint = MaterialTheme.colorScheme.label,
                 )
             }
